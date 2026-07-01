@@ -1,0 +1,25 @@
+[project]
+name = "cuga-harness-kit"
+version = "0.1.0"
+description = "Scaffolds Claude Code / Cursor / Codex skills that teach coding agents to build with the cuga framework"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+cuga-harness-kit = "cuga_harness_kit.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/cuga_harness_kit"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
