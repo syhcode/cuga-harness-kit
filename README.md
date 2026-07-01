@@ -2,7 +2,24 @@
 
 Skills that teach Claude Code, Cursor, Codex, and Bob how to install, launch, and build with [cuga](https://github.com/cuga-project/cuga-agent) — the open-source generalist agent framework.
 
-No git clone, no marketplace install. Just:
+## Assistant quickstart
+
+Paste this into Claude Code or Cursor or Bob from the project folder you want to set up:
+
+```text
+Run `uv tool install cuga-harness-kit`, then `cuga-harness-kit init` in this folder. Then suggest what I should do next to get cuga running.
+```
+
+The assistant will install this kit, scaffold the cuga guidance files, then suggest the next steps:
+
+1. `uv add cuga` — add cuga to your project.
+2. Create a `.env` — use `docs/cuga-env-api-keys.md` for your LLM provider.
+3. `uv run cuga start demo` — launch the demo UI.
+4. Ask *"help me build a cuga tool"* or *"how do I add a policy"* when you're ready to build.
+
+## Manual install
+
+No git clone, no marketplace install:
 
 ```bash
 uv tool install cuga-harness-kit
@@ -18,8 +35,6 @@ Run `init` from an empty new project you're starting from scratch, or from insid
 - `AGENTS.md` — read wholesale by Codex (and other `AGENTS.md`-aware tools). Re-running `init` only touches the `<!-- cuga-harness-kit:start/end -->` block, so it won't clobber anything else you've written in that file.
 - `.bob/rules/cuga-<name>.md` — loaded by IBM Bob. Unlike the other three, Bob has no frontmatter/description-based selection: every file under `.bob/rules/` is injected into *every* conversation in full, not just when relevant. (Bob also auto-loads `AGENTS.md` by default, so the Codex output above already reaches it too — the `.bob/rules/` files exist for teams that want per-skill files instead of one shared doc.)
 - `docs/cuga-env-api-keys.md` — local reference for `.env` API-key setup, including OpenAI-compatible providers such as Groq.
-
-Then open the folder in your assistant of choice and ask something like *"help me build a cuga tool"* or *"how do I launch cuga"*.
 
 ## What's included (v1)
 
