@@ -7,9 +7,15 @@ description: Use when the user wants to install cuga, start the demo/web UI, or 
 
 ## Install
 
+For a new app project, initialize with `uv` and add `cuga` as a dependency so it is recorded in `pyproject.toml`:
+
 ```bash
-pip install cuga
+uv init my-cuga-app
+cd my-cuga-app
+uv add cuga
 ```
+
+For an existing project that already has a `pyproject.toml`, run `uv add cuga` from the project root. If the user only wants a quick install inside an already-active virtualenv, `uv pip install cuga` is acceptable.
 
 (`cuga` requires Python >= 3.10, < 3.14.) For working inside a checkout of the [cuga-agent](https://github.com/cuga-project/cuga-agent) repo itself instead of the published package:
 
@@ -20,12 +26,12 @@ uv venv --python=3.12 && source .venv/bin/activate
 uv sync
 ```
 
-Set an LLM API key before starting anything, e.g. `echo "OPENAI_API_KEY=..." > .env`.
+Set LLM API keys before starting anything. Use a project-local `.env`; see `docs/cuga-env-api-keys.md` for provider-specific `AGENT_SETTING_CONFIG`, `MODEL_NAME`, and API-key examples.
 
 ## Launch
 
 ```bash
-cuga start <service>
+uv run cuga start <service>
 ```
 
 Valid `<service>` values: `demo`, `demo_skills`, `demo_crm`, `demo_docs`, `demo_health`, `demo_knowledge`, `demo_supervisor`, `travel_agent`, `manager`, `registry`, `appworld`.

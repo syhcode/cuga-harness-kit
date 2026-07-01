@@ -21,3 +21,13 @@ def test_update_overwrites_differing_files(tmp_path: Path):
     init(["claude"], force=True, dry_run=False, cwd=tmp_path)
 
     assert "cuga-getting-started" in dest.read_text()
+
+
+def test_init_writes_env_api_key_guide(tmp_path: Path):
+    init(["claude"], force=False, dry_run=False, cwd=tmp_path)
+
+    guide = tmp_path / "docs" / "cuga-env-api-keys.md"
+    assert guide.is_file()
+    text = guide.read_text()
+    assert 'AGENT_SETTING_CONFIG="settings.groq.toml"' in text
+    assert 'AGENT_SETTING_CONFIG="settings.openai.toml"' in text

@@ -5,7 +5,7 @@ description: Use when the user wants to install, launch, or build something with
 
 # Getting started with cuga
 
-cuga (`pip install cuga`, [github.com/cuga-project/cuga-agent](https://github.com/cuga-project/cuga-agent)) is an agent orchestration framework: a reasoning engine + pluggable tools (OpenAPI/MCP/LangChain) + a policy system + optional RAG knowledge base + multi-agent supervision, built on LangGraph.
+cuga (`uv add cuga`, [github.com/cuga-project/cuga-agent](https://github.com/cuga-project/cuga-agent)) is an agent orchestration framework: a reasoning engine + pluggable tools (OpenAPI/MCP/LangChain) + a policy system + optional RAG knowledge base + multi-agent supervision, built on LangGraph.
 
 This skill is the entry point. Read the description of the skill that matches what the user is doing before improvising:
 

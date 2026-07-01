@@ -8,6 +8,7 @@ from pathlib import Path
 from cuga_harness_kit.render import render_agents_section, render_bob, render_mdc
 
 SKILLS_DIR = Path(__file__).parent / "skills"
+DOCS_DIR = Path(__file__).parent / "docs"
 ALL_TARGETS = ("claude", "cursor", "codex", "bob")
 AGENTS_START = "<!-- cuga-harness-kit:start -->"
 AGENTS_END = "<!-- cuga-harness-kit:end -->"
@@ -24,7 +25,7 @@ def _detect_cuga_message(cwd: Path) -> str:
     )
     if looks_like_cuga_checkout:
         return "Detected an existing cuga source checkout — skills will reference your local `cuga` package."
-    return "No existing cuga installation detected — skills will guide you through `pip install cuga` from scratch."
+    return "No existing cuga installation detected — skills will guide you through `uv init` and `uv add cuga` from scratch."
 
 
 def _write_file(path: Path, content: str, *, force: bool, dry_run: bool, written: list[str], skipped: list[str]) -> None:
@@ -97,6 +98,16 @@ def init(targets: list[str], *, force: bool, dry_run: bool, cwd: Path | None = N
             src = skill_path / "SKILL.md"
             dest = cwd / ".bob" / "rules" / f"cuga-{skill_path.name}.md"
             _write_file(dest, render_bob(src), force=force, dry_run=dry_run, written=written, skipped=skipped)
+
+    env_doc = DOCS_DIR / "env-api-keys.md"
+    _write_file(
+        cwd / "docs" / "cuga-env-api-keys.md",
+        env_doc.read_text(),
+        force=force,
+        dry_run=dry_run,
+        written=written,
+        skipped=skipped,
+    )
 
     print(f"\n{len(written)} file(s) written, {len(skipped)} skipped.")
     for line in written:

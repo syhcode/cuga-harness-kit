@@ -12,7 +12,7 @@ Knowledge is **enabled by default** (`enable_knowledge=True`); the SDK auto-inje
 ## Try it
 
 ```bash
-cuga start demo_knowledge
+uv run cuga start demo_knowledge
 ```
 
 Full walkthrough with sample docs: `docs/examples/knowledge_demo/` in a cuga-agent checkout.

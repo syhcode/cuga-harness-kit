@@ -169,7 +169,7 @@ format_config: |
 ## Testing
 
 ```bash
-cuga start competition --local
+uv run cuga start competition --local
 ```
 
 Trigger the policy with matching keywords/intent and confirm the expected block/guidance/approval/format behavior shows up.

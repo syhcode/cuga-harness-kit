@@ -69,7 +69,7 @@ asyncio.run(main())
 - Mix local `CugaAgent`s with remote agents via A2A: pass an `"agent_name": {"type": "external", "description": "...", "config": {"a2a_protocol": {...}}}` entry in `agents=`.
 - Pass data between sub-agents with `variables=["var_name"]`.
 - `CugaSupervisor.from_yaml("path/to/config.yaml")` loads agents from a config file instead of constructing them in code.
-- Try it live first: `cuga start demo_supervisor` (see `cuga-install-and-launch`).
+- Try it live first: `uv run cuga start demo_supervisor` (see `cuga-install-and-launch`).
 
 ## Reference
 

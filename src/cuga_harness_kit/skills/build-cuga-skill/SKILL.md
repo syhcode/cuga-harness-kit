@@ -42,10 +42,10 @@ Name validation: no path separators or `..` in `name` — cuga sanitizes/rejects
 ## Try it
 
 ```bash
-cuga start demo_skills
+uv run cuga start demo_skills
 ```
 
-Runs with `[advanced_features] sandbox_mode = "native"` by default. For sandboxed execution instead: `uv sync --extra opensandbox` then use the `opensandbox` mode, or `uv sync --group sandbox` + `cuga start demo --sandbox` with `[skills]` enabled for Docker/Podman isolation.
+Runs with `[advanced_features] sandbox_mode = "native"` by default. For sandboxed execution instead: `uv sync --extra opensandbox` then use the `opensandbox` mode, or `uv sync --group sandbox` + `uv run cuga start demo --sandbox` with `[skills]` enabled for Docker/Podman isolation.
 
 ## Installing a ready-made skill
 
@@ -55,7 +55,7 @@ Anthropic publishes ready-made skill folders (e.g. `pptx`) that follow the same 
 npx skills add https://github.com/anthropics/skills --skill pptx -a universal
 ```
 
-This drops it under `.agents/skills/pptx/SKILL.md`. To use cuga's default layout instead, copy/symlink it into `.cuga/skills/`. Add `-g` to install globally. Restart `cuga start demo_skills` (or your app) afterward so skills are rescanned — there's no hot-reload.
+This drops it under `.agents/skills/pptx/SKILL.md`. To use cuga's default layout instead, copy/symlink it into `.cuga/skills/`. Add `-g` to install globally. Restart `uv run cuga start demo_skills` (or your app) afterward so skills are rescanned — there's no hot-reload.
 
 ## Don't confuse this with policies
 

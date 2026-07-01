@@ -5,9 +5,11 @@ Skills that teach Claude Code, Cursor, Codex, and Bob how to install, launch, an
 No git clone, no marketplace install. Just:
 
 ```bash
-pip install cuga-harness-kit
+uv tool install cuga-harness-kit
 cuga-harness-kit init
 ```
+
+If you're installing inside an already-active virtualenv instead of as a CLI tool, use `uv pip install cuga-harness-kit`.
 
 Run `init` from an empty new project you're starting from scratch, or from inside an existing cuga checkout — either way it writes the same skill set into the current directory:
 
@@ -15,6 +17,7 @@ Run `init` from an empty new project you're starting from scratch, or from insid
 - `.cursor/rules/cuga-<name>.mdc` — auto-discovered by Cursor.
 - `AGENTS.md` — read wholesale by Codex (and other `AGENTS.md`-aware tools). Re-running `init` only touches the `<!-- cuga-harness-kit:start/end -->` block, so it won't clobber anything else you've written in that file.
 - `.bob/rules/cuga-<name>.md` — loaded by IBM Bob. Unlike the other three, Bob has no frontmatter/description-based selection: every file under `.bob/rules/` is injected into *every* conversation in full, not just when relevant. (Bob also auto-loads `AGENTS.md` by default, so the Codex output above already reaches it too — the `.bob/rules/` files exist for teams that want per-skill files instead of one shared doc.)
+- `docs/cuga-env-api-keys.md` — local reference for `.env` API-key setup, including OpenAI-compatible providers such as Groq.
 
 Then open the folder in your assistant of choice and ask something like *"help me build a cuga tool"* or *"how do I launch cuga"*.
 
@@ -23,7 +26,7 @@ Then open the folder in your assistant of choice and ask something like *"help m
 | Skill | Teaches |
 |---|---|
 | `getting-started` | Entry point — routes to the right skill below. |
-| `install-and-launch` | `pip install cuga`, `cuga start <mode>`. |
+| `install-and-launch` | `uv init`, `uv add cuga`, `.env` API keys, `uv run cuga start <mode>`. |
 | `build-agent` | `CugaAgent` / `CugaSupervisor` SDK basics. |
 | `build-cuga-skill` | Authoring cuga's own **runtime** skills (`.cuga/skills/<name>/SKILL.md`) — not to be confused with the IDE-assistant skills in this repo. |
 | `build-tool` | Registering a LangChain / OpenAPI / MCP tool. |
@@ -49,11 +52,25 @@ cuga-harness-kit update [--targets claude,cursor,codex,bob] [--dry-run]   # alia
 New releases of `cuga-harness-kit` ship improved skill content. To pick it up in a project that already ran `init`:
 
 ```bash
-pip install --upgrade cuga-harness-kit
+uv tool upgrade cuga-harness-kit
 cuga-harness-kit update
 ```
 
+If you installed in an active virtualenv, use `uv pip install --upgrade cuga-harness-kit` instead.
+
 `update` is `init --force` under another name — same `--targets`/`--dry-run` flags apply. It overwrites `.claude/skills/*`, `.cursor/rules/*`, and `.bob/rules/*` unconditionally, so **if you hand-edited a scaffolded skill file to customize it for your project, `update` will clobber that edit** (there's no diff/merge — `AGENTS.md`'s marker block is the only part that merges non-destructively). If you want to keep a customization, copy it out from under `.claude/skills/`, `.cursor/rules/`, or `.bob/rules/` (they're plain files these tools will pick up regardless of name) before running `update`.
+
+## cuga project setup
+
+When the generated skills help a user install cuga in an app, they default to a `uv` project so dependencies are captured in `pyproject.toml`:
+
+```bash
+uv init my-cuga-app
+cd my-cuga-app
+uv add cuga
+```
+
+For API keys and OpenAI-compatible provider settings, see [`docs/env-api-keys.md`](docs/env-api-keys.md).
 
 ## Development
 
