@@ -1,14 +1,14 @@
-"""`cuga-harness-kit init` — scaffold cuga skill files for Claude Code, Cursor, and Codex."""
+"""`cuga-harness-kit init` — scaffold cuga skill files for Claude Code, Cursor, Codex, and Bob."""
 
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
 
-from cuga_harness_kit.render import render_agents_section, render_mdc
+from cuga_harness_kit.render import render_agents_section, render_bob, render_mdc
 
 SKILLS_DIR = Path(__file__).parent / "skills"
-ALL_TARGETS = ("claude", "cursor", "codex")
+ALL_TARGETS = ("claude", "cursor", "codex", "bob")
 AGENTS_START = "<!-- cuga-harness-kit:start -->"
 AGENTS_END = "<!-- cuga-harness-kit:end -->"
 
@@ -92,13 +92,19 @@ def init(targets: list[str], *, force: bool, dry_run: bool, cwd: Path | None = N
     if "codex" in targets:
         _write_agents_md(cwd, [p / "SKILL.md" for p in skill_paths], dry_run=dry_run, written=written, skipped=skipped)
 
+    if "bob" in targets:
+        for skill_path in skill_paths:
+            src = skill_path / "SKILL.md"
+            dest = cwd / ".bob" / "rules" / f"cuga-{skill_path.name}.md"
+            _write_file(dest, render_bob(src), force=force, dry_run=dry_run, written=written, skipped=skipped)
+
     print(f"\n{len(written)} file(s) written, {len(skipped)} skipped.")
     for line in written:
         print(f"  wrote:    {line}")
     for line in skipped:
         print(f"  skipped:  {line}")
     print(
-        '\nNext step: open this folder in Claude Code, Cursor, or Codex, and try asking '
+        '\nNext step: open this folder in Claude Code, Cursor, Codex, or Bob, and try asking '
         '"help me build a cuga tool" or "how do I launch cuga".'
     )
 
