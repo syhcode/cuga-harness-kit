@@ -109,27 +109,37 @@ def init(targets: list[str], *, force: bool, dry_run: bool, cwd: Path | None = N
     )
 
 
+def _add_targets_arg(subparser: argparse.ArgumentParser) -> None:
+    subparser.add_argument(
+        "--targets",
+        default=",".join(ALL_TARGETS),
+        help=f"comma-separated subset of {ALL_TARGETS} (default: all)",
+    )
+    subparser.add_argument("--dry-run", action="store_true", help="print what would be written, write nothing")
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="cuga-harness-kit")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     init_parser = subparsers.add_parser("init", help="scaffold cuga skill files into the current directory")
-    init_parser.add_argument(
-        "--targets",
-        default=",".join(ALL_TARGETS),
-        help=f"comma-separated subset of {ALL_TARGETS} (default: all)",
-    )
+    _add_targets_arg(init_parser)
     init_parser.add_argument("--force", action="store_true", help="overwrite files that already exist and differ")
-    init_parser.add_argument("--dry-run", action="store_true", help="print what would be written, write nothing")
+
+    update_parser = subparsers.add_parser(
+        "update", help="re-scaffold cuga skill files after upgrading cuga-harness-kit (alias for `init --force`)"
+    )
+    _add_targets_arg(update_parser)
 
     args = parser.parse_args(argv)
 
-    if args.command == "init":
+    if args.command in ("init", "update"):
         targets = [t.strip() for t in args.targets.split(",") if t.strip()]
         unknown = set(targets) - set(ALL_TARGETS)
         if unknown:
             parser.error(f"unknown target(s): {', '.join(sorted(unknown))} (choose from {ALL_TARGETS})")
-        init(targets, force=args.force, dry_run=args.dry_run)
+        force = True if args.command == "update" else args.force
+        init(targets, force=force, dry_run=args.dry_run)
 
 
 if __name__ == "__main__":

@@ -37,11 +37,23 @@ All 8 are authored once, as Claude-native `SKILL.md` files under `src/cuga_harne
 
 ```bash
 cuga-harness-kit init [--targets claude,cursor,codex,bob] [--force] [--dry-run]
+cuga-harness-kit update [--targets claude,cursor,codex,bob] [--dry-run]   # alias for `init --force`
 ```
 
 - `--targets` — comma-separated subset of `claude`, `cursor`, `codex`, `bob` (default: all four).
 - `--force` — overwrite `.claude/skills/*`, `.cursor/rules/*`, and `.bob/rules/*` files that already exist with different content (default: skip and report). `AGENTS.md`'s managed block always updates regardless, since it never touches content outside its markers.
 - `--dry-run` — print what would be written without touching disk.
+
+## Updating
+
+New releases of `cuga-harness-kit` ship improved skill content. To pick it up in a project that already ran `init`:
+
+```bash
+pip install --upgrade cuga-harness-kit
+cuga-harness-kit update
+```
+
+`update` is `init --force` under another name — same `--targets`/`--dry-run` flags apply. It overwrites `.claude/skills/*`, `.cursor/rules/*`, and `.bob/rules/*` unconditionally, so **if you hand-edited a scaffolded skill file to customize it for your project, `update` will clobber that edit** (there's no diff/merge — `AGENTS.md`'s marker block is the only part that merges non-destructively). If you want to keep a customization, copy it out from under `.claude/skills/`, `.cursor/rules/`, or `.bob/rules/` (they're plain files these tools will pick up regardless of name) before running `update`.
 
 ## Development
 
@@ -52,4 +64,4 @@ uv run pytest
 
 ## Phase 2 (not yet built)
 
-Real Claude Code plugin packaging (`.claude-plugin/plugin.json` + marketplace listing for `/plugin install`), slash commands, session hooks, a smarter `update`/diff command, and additional harness targets (Windsurf, `.clinerules`, `GEMINI.md`) — add these only if a real gap shows up.
+Real Claude Code plugin packaging (`.claude-plugin/plugin.json` + marketplace listing for `/plugin install`), slash commands, session hooks, a smarter 3-way merge for `update` (today it's a blind overwrite), and additional harness targets (Windsurf, `.clinerules`, `GEMINI.md`) — add these only if a real gap shows up.
