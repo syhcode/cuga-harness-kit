@@ -13,7 +13,7 @@ def fake_kit(tmp_path, monkeypatch):
     """Point migration.scaffold_migration at a small fake kit tree instead of the real
     packaged one."""
     kits_root = tmp_path / "kits_pkg"
-    kit_dir = kits_root / "agentic-skills" / "claude"
+    kit_dir = kits_root / "migration-skills" / "claude"
     (kit_dir / "cuga-templates" / "scripts").mkdir(parents=True)
     (kit_dir / ".claude" / "skills" / "cuga-migrator").mkdir(parents=True)
     (kit_dir / "README.md").write_text("hello\n")
@@ -57,7 +57,7 @@ def test_scaffold_migration_writes_kit_tree_into_cwd(tmp_path, fake_kit):
 
     assert (cwd / "README.md").read_text() == "hello\n"
     assert (cwd / ".claude" / "skills" / "cuga-migrator" / "SKILL.md").is_file()
-    assert not (cwd / "agentic-skills").exists()
+    assert not (cwd / "migration-skills").exists()
 
 
 def test_scaffold_migration_sets_scripts_executable_including_nested(tmp_path, fake_kit):

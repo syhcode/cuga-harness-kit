@@ -38,7 +38,7 @@ def scaffold_migration(
     same helper the rest of `init` uses), so migration output gets the same per-file
     skip/force/dry-run/report semantics as everything else `init` scaffolds.
     """
-    kit_src = importlib.resources.files("cuga_harness_kit") / "agentic-skills" / target
+    kit_src = importlib.resources.files("cuga_harness_kit") / "migration-skills" / target
     dest_paths: list[Path] = []
     with importlib.resources.as_file(kit_src) as kit_path:
         for src_file in sorted(kit_path.rglob("*")):

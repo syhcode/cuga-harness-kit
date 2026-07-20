@@ -39,7 +39,7 @@ def test_init_writes_env_api_key_guide(tmp_path: Path):
 @pytest.fixture
 def fake_migration_kit(tmp_path, monkeypatch):
     kits_root = tmp_path / "kits_pkg"
-    kit_dir = kits_root / "agentic-skills" / "claude"
+    kit_dir = kits_root / "migration-skills" / "claude"
     (kit_dir / ".claude" / "skills" / "cuga-migrator").mkdir(parents=True)
     (kit_dir / ".claude" / "skills" / "cuga-migrator" / "SKILL.md").write_text("---\nname: cuga-migrator\n---\nhi\n")
     (kit_dir / "migrate.sh").write_text("#!/usr/bin/env bash\necho migrate\n")

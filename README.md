@@ -69,7 +69,7 @@ Besides the 8 guidance skills, this kit also ships the **cuga-migrator** pipelin
 heavier tool that converts a *different* source agent system into a cuga SDK implementation,
 using a 5-stage subagent pipeline (analyst → implementer → test_writer → evaluator → debugger).
 It's opt-in: plain `init` never touches it. Its canonical, hand-maintained source lives under
-`src/cuga_harness_kit/agentic-skills/{claude,bob}/` (plus the shared `cuga-templates/` alongside
+`src/cuga_harness_kit/migration-skills/{claude,bob}/` (plus the shared `cuga-templates/` alongside
 them) — a separate boundary from the plain guidance skills, since this content is a full
 standalone project (subagents, launch scripts, its own directory layout) rather than a single
 `SKILL.md`.
