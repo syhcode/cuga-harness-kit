@@ -54,13 +54,59 @@ All 8 are authored once, as Claude-native `SKILL.md` files under `src/cuga_harne
 ## CLI
 
 ```bash
-cuga-harness-kit init [--targets claude,cursor,codex,bob] [--force] [--dry-run]
-cuga-harness-kit update [--targets claude,cursor,codex,bob] [--dry-run]   # alias for `init --force`
+cuga-harness-kit init [--targets claude,cursor,codex,bob] [--force] [--dry-run] [--migration] [--skip-sdk] [--cuga-ref REF]
+cuga-harness-kit update [--targets claude,cursor,codex,bob] [--dry-run] [--migration] [--skip-sdk] [--cuga-ref REF]   # alias for `init --force`
 ```
 
 - `--targets` — comma-separated subset of `claude`, `cursor`, `codex`, `bob` (default: all four).
 - `--force` — overwrite `.claude/skills/*`, `.cursor/rules/*`, and `.bob/skills/*` files that already exist with different content (default: skip and report). `AGENTS.md`'s managed block always updates regardless, since it never touches content outside its markers.
 - `--dry-run` — print what would be written without touching disk.
+- `--migration` / `--skip-sdk` / `--cuga-ref` — see "Migration pipeline" below.
+
+## Migration pipeline (optional, claude/bob only)
+
+Besides the 8 guidance skills, this kit also ships the **cuga-migrator** pipeline — a separate,
+heavier tool that converts a *different* source agent system into a cuga SDK implementation,
+using a 5-stage subagent pipeline (analyst → implementer → test_writer → evaluator → debugger).
+It's opt-in: plain `init` never touches it.
+
+```bash
+cuga-harness-kit init --targets claude --migration   # or --targets bob
+```
+
+This additionally scaffolds `.claude/commands/migrate.md`, `.claude/agents/*.md` (the 5 subagents),
+the `cuga-migrator` / `cuga-source-sync` / `cuga-template-sync` skills, `cuga-templates/`,
+`migrate.sh` / `source_sync.sh` / `cuga_sync.sh`, and `migration_from/`/`migration_to/` — then
+`git clone`s the [cuga SDK](https://github.com/cuga-project/cuga-agent) into
+`migration_to/cuga-agent/` (shallow, `--depth 1`), which the pipeline's own agents/skills read
+directly (e.g. `migration_to/cuga-agent/src/cuga/sdk.py`).
+
+- Only `claude` and `bob` support it — the pipeline needs subagent/orchestration primitives Cursor
+  and Codex don't have. `--migration` with only `cursor`/`codex` in `--targets` prints a notice
+  and does nothing.
+- `--skip-sdk` skips the SDK clone (copy it in yourself: `git clone
+  https://github.com/cuga-project/cuga-agent migration_to/cuga-agent`). `--cuga-ref
+  <branch-or-tag>` pins a specific version. If `migration_to/cuga-agent/` already exists, `init`
+  leaves it alone (never re-clones, `--force` or not).
+- **`.claude/settings.json` and `.claude/hooks/` are intentionally not scaffolded** — writing or
+  merging a settings file is too easy to clobber a project's existing permissions/hooks config. If
+  you want the upstream tool-use-logging hook, wire it in yourself.
+- Once scaffolded, three more subcommands become available, each dispatching to the matching
+  launch script in the current directory (or ask Claude Code / Bob directly — the `cuga-migrator`,
+  `cuga-source-sync`, and `cuga-template-sync` skills are natural-language triggered the same way
+  the other 8 skills are):
+
+  ```bash
+  cuga-harness-kit migrate <source-name> <target-name> [--stages stage[,stage...]]
+  cuga-harness-kit source_sync <source-name>
+  cuga-harness-kit cuga_sync
+  ```
+
+  `migrate` runs the full pipeline (or just the listed `--stages`); `source_sync` scouts a new
+  source repo under `migration_from/<name>/` and writes its `CLAUDE.md`; `cuga_sync` syncs
+  `cuga-templates/` against a `migration_to/cuga-agent/` you've updated to a newer SDK version. See
+  the scaffolded kit's own `README.md` (written alongside everything else by `init --migration`)
+  for the full credentials/directory-layout reference and natural-language trigger phrasing.
 
 ## Updating
 

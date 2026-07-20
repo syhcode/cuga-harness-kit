@@ -1,0 +1,59 @@
+================================================================================
+TRACE FLOW SUMMARY - CIR EXPLAINABILITY SECTION
+Incident: SF-INC-000008654
+================================================================================
+
+1. USER INPUT
+================================================================================
+Request: "Compose CIR explainability for incident number SF-INC-000008654"
+
+Context: Part of sequential CIR composition workflow
+
+================================================================================
+
+2. ROUTING DECISION BY askSRE_ReAct AGENT
+================================================================================
+Agent: askSRE_ReAct
+Decision: Query explainability data from incident learning catalog
+Required Tools: query_incident_explainability
+
+================================================================================
+
+3. TOOL EXECUTION SEQUENCE
+================================================================================
+
+STEP 1: Query Incident Explainability
+----------------------------------------------
+Tool: query_incident_explainability
+Parameters: {"incident_number": "SF-INC-000008654"}
+Result: SUCCESS
+Response: Retrieved LLM-generated extractions with:
+- Confidence scores
+- Source documents (GitHub issue URLs)
+- Extracted insights
+- Solution details
+
+Example extraction:
+{
+  "extraction_id": "2abfbbd6-5e30-417a-816d-c10d117dbd30",
+  "extraction_type": "solution",
+  "content": "Resolved by MCSP team after TLS certificate failure caused UIProxyAssistantBuilder5xx errors...",
+  "confidence_score": 0.95,
+  "source_url": "https://github.ibm.com/WatsonOrchestrate/wo-tracker/issues/65389"
+}
+
+================================================================================
+
+4. FINAL OUTPUT (from cir_composer sub-agent)
+================================================================================
+
+**Explainability Data – Actions (SF‑INC‑000008654)**
+
+| Extraction ID | LLM Label | Normalized Summary (Action) | Confidence | Source URL |
+|---|---|---|---|---|
+| 2abfbbd6-5e30-417a-816d-c10d117dbd30 | **solution** | *Resolved by MCSP team after TLS certificate failure caused UIProxyAssistantBuilder5xx errors, with plans to improve detection time through new alerts and prioritization.* | 0.95 | https://github.ibm.com/WatsonOrchestrate/wo-tracker/issues/65389#issuecomment |
+| 2abfbbd6-5e30-417a-816d-c10d117dbd30 | **solution** | *Resolved by MCSP team after TLS certificate failure caused UIProxyAssistantBuilder5xx errors, with plans to improve detection time through new alerts and prioritization.* | 0.95 | https://github.ibm.com/WatsonOrchestrate/wo-tracker/issues/65389 |
+
+> **Note:** The actions section in the incident record consists of one completed remediation step ("MCSP team resolved the issue") and three planned prevention steps ("Improve alert prioritization", "Add dedicated log‑based causal alert", "Add a new type: correlated alert"). The LLM extraction engine currently provides a single "solution" extraction (ID 2abfbbd6‑5e30‑417a‑816d‑c10d117dbd30) that captures the remediation outcome and the high‑level prevention intent. No separate LLM‑generated extractions were produced for the individual planned prevention actions.
+
+================================================================================
