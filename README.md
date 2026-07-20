@@ -49,7 +49,7 @@ Run `init` from an empty new project you're starting from scratch, or from insid
 | `knowledge-rag` | Document ingestion/search. |
 | `debug-trajectory` | `cuga viz`, `cuga doctor`, common failure patterns. |
 
-All 8 are authored once, as Claude-native `SKILL.md` files under `src/cuga_harness_kit/skills/`, and used verbatim for Bob or rendered into the Cursor/Codex shapes at `init` time (`src/cuga_harness_kit/render.py`) — there's a single source of truth per skill, not four copies to keep in sync by hand.
+All 8 are authored once, as Claude-native `SKILL.md` files under `src/cuga_harness_kit/plain-skills/`, and used verbatim for Bob or rendered into the Cursor/Codex shapes at `init` time (`src/cuga_harness_kit/render.py`) — there's a single source of truth per skill, not four copies to keep in sync by hand.
 
 ## CLI
 
@@ -68,7 +68,11 @@ cuga-harness-kit update [--targets claude,cursor,codex,bob] [--dry-run] [--migra
 Besides the 8 guidance skills, this kit also ships the **cuga-migrator** pipeline — a separate,
 heavier tool that converts a *different* source agent system into a cuga SDK implementation,
 using a 5-stage subagent pipeline (analyst → implementer → test_writer → evaluator → debugger).
-It's opt-in: plain `init` never touches it.
+It's opt-in: plain `init` never touches it. Its canonical, hand-maintained source lives under
+`src/cuga_harness_kit/agentic-skills/{claude,bob}/` (plus the shared `cuga-templates/` alongside
+them) — a separate boundary from the plain guidance skills, since this content is a full
+standalone project (subagents, launch scripts, its own directory layout) rather than a single
+`SKILL.md`.
 
 ```bash
 cuga-harness-kit init --targets claude --migration   # or --targets bob

@@ -9,7 +9,7 @@ from pathlib import Path
 from cuga_harness_kit import dispatch, migration
 from cuga_harness_kit.render import render_agents_section, render_mdc
 
-SKILLS_DIR = Path(__file__).parent / "skills"
+SKILLS_DIR = Path(__file__).parent / "plain-skills"
 DOCS_DIR = Path(__file__).parent / "docs"
 ALL_TARGETS = ("claude", "cursor", "codex", "bob")
 AGENTS_START = "<!-- cuga-harness-kit:start -->"

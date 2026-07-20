@@ -1,22 +1,24 @@
 """Custom Hatchling build hook.
 
-cuga-migrator-claude/ and cuga-migrator-bob/ are the canonical, hand-maintained migration kits and
-live alongside this file, as siblings of pyproject.toml — they are never copied into src/ and
-never edited by this build. Plain `force-include` doesn't filter anything (Hatchling applies
-`exclude` patterns to normal inclusion mechanisms but not to `force-include`), so this hook stages
-a filtered copy of each kit and force-includes the staged copy instead.
+src/cuga_harness_kit/agentic-skills/{claude,bob}/ are the canonical, hand-maintained migration
+kits — never edited by this build. They live under `packages = ["src/cuga_harness_kit"]`'s normal
+inclusion boundary, so both wheel and sdist targets explicitly `exclude` the raw agentic-skills/
+tree in pyproject.toml (claude/ and bob/ specifically for sdist; the whole directory for wheel).
+Plain `force-include` doesn't filter anything (Hatchling applies `exclude` patterns to normal
+inclusion mechanisms but not to `force-include`), so this hook stages a filtered copy of each kit
+and force-includes the staged copy back in instead.
 
 Two build targets both run this hook (see pyproject.toml):
 
-- sdist: filters fresh from cuga-migrator-<target>/ and bundles the filtered copy inside the
+- sdist: filters fresh from agentic-skills/<target>/ and bundles the filtered copy inside the
   sdist itself, under kits_staged/<target>/. This is required because `uv build` (and `python -m
   build`) build the wheel *from* the sdist, not from the original project tree — by that point
-  the raw cuga-migrator-<target>/ tree (with its unfiltered .git/, test fixtures, etc.) isn't
+  the raw agentic-skills/<target>/ tree (with its unfiltered .git/, test fixtures, etc.) isn't
   part of the sdist's own source selection, so the wheel step must read the already-filtered
   kits_staged/ copy instead of re-deriving it.
 - wheel: if kits_staged/<target>/ exists (building from an sdist that already carries it), reuse
   it as-is. Otherwise (a direct/local wheel build, e.g. `uv build --wheel` or an editable
-  `uv sync` straight against this project tree) filter fresh from cuga-migrator-<target>/, same
+  `uv sync` straight against this project tree) filter fresh from agentic-skills/<target>/, same
   as the sdist path does.
 """
 
@@ -43,7 +45,10 @@ KIT_FILTERS = {
     },
 }
 
-KITS = {"claude": "cuga-migrator-claude", "bob": "cuga-migrator-bob"}
+KITS = {
+    "claude": "src/cuga_harness_kit/agentic-skills/claude",
+    "bob": "src/cuga_harness_kit/agentic-skills/bob",
+}
 
 SDIST_STAGING_DIR = "kits_staged"
 
@@ -73,7 +78,7 @@ class CugaKitsBuildHook(BuildHookInterface):
             if self.target_name == "sdist":
                 build_data.setdefault("force_include", {})[str(dest)] = f"{SDIST_STAGING_DIR}/{target}"
             else:
-                build_data.setdefault("force_include", {})[str(dest)] = f"cuga_harness_kit/migration_kits/{target}"
+                build_data.setdefault("force_include", {})[str(dest)] = f"cuga_harness_kit/agentic-skills/{target}"
 
     @staticmethod
     def _ensure_migration_from(dest: Path) -> None:
