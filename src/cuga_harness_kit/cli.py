@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from cuga_harness_kit.render import render_agents_section, render_bob, render_mdc
+from cuga_harness_kit.render import render_agents_section, render_mdc
 
 SKILLS_DIR = Path(__file__).parent / "skills"
 DOCS_DIR = Path(__file__).parent / "docs"
@@ -96,8 +96,8 @@ def init(targets: list[str], *, force: bool, dry_run: bool, cwd: Path | None = N
     if "bob" in targets:
         for skill_path in skill_paths:
             src = skill_path / "SKILL.md"
-            dest = cwd / ".bob" / "rules" / f"cuga-{skill_path.name}.md"
-            _write_file(dest, render_bob(src), force=force, dry_run=dry_run, written=written, skipped=skipped)
+            dest = cwd / ".bob" / "skills" / skill_path.name / "SKILL.md"
+            _write_file(dest, src.read_text(), force=force, dry_run=dry_run, written=written, skipped=skipped)
 
     env_doc = DOCS_DIR / "env-api-keys.md"
     _write_file(

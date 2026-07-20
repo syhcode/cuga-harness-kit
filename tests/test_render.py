@@ -3,7 +3,7 @@ import re
 import yaml
 
 from cuga_harness_kit.cli import SKILLS_DIR, _skill_dirs
-from cuga_harness_kit.render import parse_skill_md, render_agents_section, render_bob, render_mdc
+from cuga_harness_kit.render import parse_skill_md, render_agents_section, render_mdc
 
 GETTING_STARTED = SKILLS_DIR / "getting-started" / "SKILL.md"
 
@@ -42,17 +42,6 @@ def test_render_agents_section_shape():
     assert "### Two different meanings" in section
 
 
-def test_render_bob_shape():
-    _, body = parse_skill_md(GETTING_STARTED)
-    rendered = render_bob(GETTING_STARTED)
-
-    # Bob has no frontmatter concept and doesn't select rules by description,
-    # so the body goes in verbatim with no YAML header at all.
-    assert not rendered.startswith("---")
-    assert rendered == body + "\n"
-
-
 def test_render_is_pure_and_repeatable():
     assert render_mdc(GETTING_STARTED) == render_mdc(GETTING_STARTED)
     assert render_agents_section(GETTING_STARTED) == render_agents_section(GETTING_STARTED)
-    assert render_bob(GETTING_STARTED) == render_bob(GETTING_STARTED)
