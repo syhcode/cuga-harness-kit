@@ -1,12 +1,15 @@
 """Custom Hatchling build hook.
 
 src/cuga_harness_kit/migration-skills/{claude,bob}/ are the canonical, hand-maintained migration
-kits — never edited by this build. They live under `packages = ["src/cuga_harness_kit"]`'s normal
-inclusion boundary, so both wheel and sdist targets explicitly `exclude` the raw migration-skills/
-tree in pyproject.toml (claude/ and bob/ specifically for sdist; the whole directory for wheel).
-Plain `force-include` doesn't filter anything (Hatchling applies `exclude` patterns to normal
-inclusion mechanisms but not to `force-include`), so this hook stages a filtered copy of each kit
-and force-includes the staged copy back in instead.
+kits — never edited by this build. src/cuga_harness_kit/migration-skills/cuga-templates/ is shared
+between them (a plain directory, not a symlink — `initialize` below copies it into each staged kit
+explicitly) so it's authored once. The kit dirs live under
+`packages = ["src/cuga_harness_kit"]`'s normal inclusion boundary, so both wheel and sdist targets
+explicitly `exclude` the raw migration-skills/ tree in pyproject.toml (claude/ and bob/
+specifically for sdist; the whole directory for wheel). Plain `force-include` doesn't filter
+anything (Hatchling applies `exclude` patterns to normal inclusion mechanisms but not to
+`force-include`), so this hook stages a filtered copy of each kit and force-includes the staged
+copy back in instead.
 
 Two build targets both run this hook (see pyproject.toml):
 
@@ -50,6 +53,8 @@ KITS = {
     "bob": "src/cuga_harness_kit/migration-skills/bob",
 }
 
+SHARED_TEMPLATES = "src/cuga_harness_kit/migration-skills/cuga-templates"
+
 SDIST_STAGING_DIR = "kits_staged"
 
 
@@ -68,6 +73,11 @@ class CugaKitsBuildHook(BuildHookInterface):
             else:
                 src = Path(self.root) / src_name
                 self._copy_filtered(src, dest, KIT_FILTERS[target])
+                shutil.copytree(
+                    Path(self.root) / SHARED_TEMPLATES,
+                    dest / "cuga-templates",
+                    ignore=shutil.ignore_patterns(*GENERIC_SKIP_NAMES),
+                )
                 self._ensure_migration_from(dest)
 
             for sh in dest.glob("*.sh"):
@@ -104,6 +114,4 @@ class CugaKitsBuildHook(BuildHookInterface):
                         ignored.update(fnmatch.filter(names, pattern))
             return ignored
 
-        # symlinks default to False (dereference) so the cuga-templates -> ../cuga-templates
-        # symlink each kit carries gets copied as a real, self-contained directory.
         shutil.copytree(src, dest, ignore=ignore)
