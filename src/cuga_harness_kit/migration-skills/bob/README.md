@@ -47,7 +47,7 @@ Or run `./source_sync.sh <source-name>` — see "Launch scripts" below.
 
 **(Optional) Add a user request to shape the migration**
 
-Create `migration_to/.cuga-migrator/user_request.md` to give the orchestrator persistent
+Create `.cuga-migrator/user_request.md` to give the orchestrator persistent
 high-level intent. It's read before the pipeline starts and surfaced in every stage's subagent
 prompt, so it influences architecture choice, naming, and implementation decisions. Example:
 
@@ -131,7 +131,7 @@ one-time copy/paste is unavoidable.
 
 **Before it opens bob, the script copies that request to your clipboard** (`pbcopy` /
 `xclip` / `xsel`, whichever is available) and saves it to
-`migration_to/.cuga-migrator/last_prompt.txt` — because bob's interactive TUI typically clears the
+`.cuga-migrator/last_prompt.txt` — because bob's interactive TUI typically clears the
 terminal on launch, wiping out the printed text before you'd get a chance to read it back. **If bob
 opens and appears to just sit there doing nothing**, that's not a hang — it's idle, waiting for
 your first message. Paste (the request is already in your clipboard) and press Enter.
@@ -228,12 +228,12 @@ migration_to/            # generated CUGA implementations land here
     prediction/           # eval outputs (actual_outputs/, logs/, eval_report.json)
     debug_log/             # debug_<iteration>.md per debug cycle
   .env                    # CUGA runtime credentials
-  .cuga-migrator/          # pipeline state, spec, eval reports (auto-generated)
-    migration_spec.md       # analyst stage output
-    source_summary.md       # analyst stage intermediate notes
-    state.json               # pipeline progress tracker
-    user_request.md          # (optional) your high-level migration intent
-    sync_report.md            # cuga-template-sync output
+.cuga-migrator/           # pipeline state, spec, eval reports (auto-generated)
+  migration_spec.md       # analyst stage output
+  source_summary.md       # analyst stage intermediate notes
+  state.json               # pipeline progress tracker
+  user_request.md          # (optional) your high-level migration intent
+  sync_report.md            # cuga-template-sync output
 cuga-templates/               # CUGA scaffolds — define the exact structure of a CUGA application
   supervisor/             # supervisor architecture (CugaSupervisor + internal CugaAgents via MCP)
   a2a_supervisor_external/ # supervisor architecture (CugaSupervisor + external agents via A2A)
@@ -282,7 +282,7 @@ and after stage 2.
 ## Resuming
 
 If a migration was interrupted, just ask again — the orchestrator reads
-`migration_to/.cuga-migrator/state.json` and skips completed stages.
+`.cuga-migrator/state.json` and skips completed stages.
 
 ## Read-only directories
 

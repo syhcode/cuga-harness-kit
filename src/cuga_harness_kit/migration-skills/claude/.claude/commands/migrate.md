@@ -30,15 +30,15 @@ Derive all paths from the arguments above:
 | Templates | `cuga-templates/` |
 | SDK reference (supervisor) | `migration_to/cuga-agent/docs/examples/travel_agent/` |
 | SDK reference (one_agent) | `migration_to/cuga-agent/docs/examples/cuga_with_runtime_tools/` |
-| Spec output | `migration_to/.cuga-migrator/migration_spec.md` |
+| Spec output | `.cuga-migrator/migration_spec.md` |
 | Prediction dir | `migration_to/data/prediction/` |
-| State file | `migration_to/.cuga-migrator/state.json` |
+| State file | `.cuga-migrator/state.json` |
 
-Create `migration_to/.cuga-migrator/` and `migration_to/<target_name>/` if they don't exist.
+Create `.cuga-migrator/` and `migration_to/<target_name>/` if they don't exist.
 
 ## User Request
 
-Before doing anything else, check if `migration_to/.cuga-migrator/user_request.md` exists. If it does, read it. Keep the user's request in mind throughout the entire pipeline and surface it explicitly in every sub-agent prompt so it shapes their decisions (architecture choice, naming, error handling, etc.).
+Before doing anything else, check if `.cuga-migrator/user_request.md` exists. If it does, read it. Keep the user's request in mind throughout the entire pipeline and surface it explicitly in every sub-agent prompt so it shapes their decisions (architecture choice, naming, error handling, etc.).
 
 ## Pipeline (adapt dynamically — do not follow blindly)
 
@@ -50,10 +50,10 @@ Call `Agent(agent_name="analyst", prompt="...")` with:
 - Templates path: `cuga-templates/`
 - SDK reference (supervisor): `migration_to/cuga-agent/docs/examples/travel_agent/`
 - SDK reference (one_agent): `migration_to/cuga-agent/docs/examples/cuga_with_runtime_tools/`
-- Spec output path: `migration_to/.cuga-migrator/migration_spec.md`
+- Spec output path: `.cuga-migrator/migration_spec.md`
 - CUGA env file: `migration_to/.env`
 
-After completion, **read `migration_to/.cuga-migrator/migration_spec.md`** and assess:
+After completion, **read `.cuga-migrator/migration_spec.md`** and assess:
 - How many agents, MCP servers, policies?
 - Any ambiguities in the Notes section?
 - **Capability coverage check** — for every agent in the spec, verify:
@@ -65,7 +65,7 @@ After completion, **read `migration_to/.cuga-migrator/migration_spec.md`** and a
 
 ### 2. Copy templates
 
-Read `migration_to/.cuga-migrator/migration_spec.md` to determine the chosen architecture, then copy:
+Read `.cuga-migrator/migration_spec.md` to determine the chosen architecture, then copy:
 
 ```bash
 cp -r cuga-templates/<architecture>/* migration_to/<target_name>/
@@ -75,7 +75,7 @@ cp -r cuga-templates/tests/* migration_to/<target_name>/
 ### 3. Implement
 
 Call `Agent(agent_name="implementer", prompt="...")` with:
-- Spec path: `migration_to/.cuga-migrator/migration_spec.md`
+- Spec path: `.cuga-migrator/migration_spec.md`
 - Output dir: `migration_to/<target_name>/`
 - CUGA SDK path: `migration_to/cuga-agent/`
 - SDK reference (supervisor): `migration_to/cuga-agent/docs/examples/travel_agent/`
@@ -138,7 +138,7 @@ shouldn't perturb full-pipeline resumability).
       | Stage | Required input(s) already on disk | If missing, tell the user to run |
       |---|---|---|
       | `analyst` | `migration_from/<source_name>/` exists | add the source repo there |
-      | `implementer` | `migration_to/.cuga-migrator/migration_spec.md` exists | `--stages analyst` first |
+      | `implementer` | `.cuga-migrator/migration_spec.md` exists | `--stages analyst` first |
       | `test_writer` | at least one `.txt` file under `migration_to/data/ground_truth/` | add ground truth files |
       | `evaluator` | `migration_to/<target_name>/test_cases.json` **and** `migration_spec.md` both exist | `--stages implementer` and/or `--stages test_writer` first |
       | `debugger` | `migration_to/data/prediction/eval_report.json` exists | `--stages evaluator` first |
@@ -161,7 +161,7 @@ shouldn't perturb full-pipeline resumability).
 
 ## State persistence
 
-After each major step, write `migration_to/.cuga-migrator/state.json`:
+After each major step, write `.cuga-migrator/state.json`:
 
 ```json
 {
@@ -173,4 +173,4 @@ After each major step, write `migration_to/.cuga-migrator/state.json`:
 }
 ```
 
-On resume (if `migration_to/.cuga-migrator/state.json` exists), read it and skip already-completed stages.
+On resume (if `.cuga-migrator/state.json` exists), read it and skip already-completed stages.

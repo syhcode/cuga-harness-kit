@@ -12,12 +12,12 @@ migration_to/data/
   ground_truth/                 # input .txt trace files (read-only)
   prediction/                   # eval outputs: actual_outputs/, traj/, eval_report.json
   debug_log/                    # debug_<iteration>.md per debug cycle
-migration_to/.cuga-migrator/
+.cuga-migrator/
   migration_spec.md             # analyst output
   source_summary.md             # analyst intermediate notes
   state.json                    # pipeline progress
 cuga-templates/                      # supervisor/, a2a_supervisor_external/, one_agent/, tests/ — canonical CUGA scaffolds
-migration_to/.cuga-migrator/
+.cuga-migrator/
   user_request.md               # (optional) user's high-level migration intent — read by orchestrator before pipeline starts
 ```
 

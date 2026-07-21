@@ -79,7 +79,7 @@ if [[ ! -f "$TRUST_FILE" ]] || ! grep -qF "$REPO" "$TRUST_FILE" 2>/dev/null; the
     echo ""
 fi
 
-mkdir -p "$REPO/migration_to/.cuga-migrator"
+mkdir -p "$REPO/.cuga-migrator"
 
 # ── Run (foreground) ────────────────────────────────────────────────────────────
 echo -e "${BOLD}Running template sync…${NC}"
@@ -91,4 +91,4 @@ PROMPT="Sync CUGA templates against the SDK — check cuga-templates/ for drift 
 bob --auth-method api-key --yolo -p "$PROMPT"
 
 echo ""
-echo -e "${GREEN}✓ Template sync finished — check migration_to/.cuga-migrator/sync_report.md${NC}"
+echo -e "${GREEN}✓ Template sync finished — check .cuga-migrator/sync_report.md${NC}"

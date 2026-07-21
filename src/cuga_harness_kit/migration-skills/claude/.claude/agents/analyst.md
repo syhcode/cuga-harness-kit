@@ -30,7 +30,7 @@ The orchestrator will give you:
 3. Only `Read` files that contain: agent definitions, tool implementations, system prompts, config flags, routing logic, or dependency lists.
 4. Target: entry points, agent definitions, tools (any external calls: DB, REST, SDK, etc.), pre/post-invoke hooks, routing logic, guards, output processing, config files, system prompts.
 
-**After exploring the source repo — write a source summary before reading anything else.** Write a compact `migration_to/.cuga-migrator/source_summary.md` capturing: agent list with their roles, tool list with their external calls, platform feature flags, any capability gaps already apparent. This preserves your findings before you load the larger SDK and template files, which may push earlier content out of context.
+**After exploring the source repo — write a source summary before reading anything else.** Write a compact `.cuga-migrator/source_summary.md` capturing: agent list with their roles, tool list with their external calls, platform feature flags, any capability gaps already apparent. This preserves your findings before you load the larger SDK and template files, which may push earlier content out of context.
 
 **CUGA SDK** — read `migration_to/cuga-agent/src/cuga/sdk.py` to understand `CugaAgent` and `CugaSupervisor` — what they do, how they are wired, what they need.
 

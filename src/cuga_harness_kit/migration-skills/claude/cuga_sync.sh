@@ -82,7 +82,7 @@ if [[ ! -d "$REPO/migration_to/cuga-agent" ]]; then
     exit 1
 fi
 
-mkdir -p "$REPO/migration_to/.cuga-migrator"
+mkdir -p "$REPO/.cuga-migrator"
 
 # ── Dispatch background session ────────────────────────────────────────────────
 echo -e "${BOLD}Dispatching sync session…${NC}"

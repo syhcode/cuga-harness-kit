@@ -59,7 +59,7 @@ export CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS="${CLAUDE_CODE_DISABLE_EXPERIMENTA
 
 # Write env vars to .claude/settings.local.json so the orchestrator and all sub-agents
 # (spawned via Agent tool) automatically pick up the same env vars.
-mkdir -p "$REPO/migration_to/.cuga-migrator"
+mkdir -p "$REPO/.cuga-migrator"
 mkdir -p "$REPO/.claude"
 SETTINGS_JSON=$(cat <<EOF
 {
@@ -74,8 +74,8 @@ SETTINGS_JSON=$(cat <<EOF
 EOF
 )
 echo "$SETTINGS_JSON" > "$REPO/.claude/settings.local.json"
-echo "$SETTINGS_JSON" > "$REPO/migration_to/.cuga-migrator/run_settings.json"
-echo -e "${DIM}Settings written → .claude/settings.local.json, migration_to/.cuga-migrator/run_settings.json${NC}"
+echo "$SETTINGS_JSON" > "$REPO/.cuga-migrator/run_settings.json"
+echo -e "${DIM}Settings written → .claude/settings.local.json, .cuga-migrator/run_settings.json${NC}"
 
 # Print which vars are active
 echo -e "${DIM}Environment:${NC}"
@@ -175,7 +175,7 @@ fi
 # ── Ground truth hint ──────────────────────────────────────────────────────────
 GT_PATH="$REPO/migration_to/data/ground_truth"
 mkdir -p "$GT_PATH"
-mkdir -p "$REPO/migration_to/.cuga-migrator"
+mkdir -p "$REPO/.cuga-migrator"
 
 GT_COUNT=$(find "$GT_PATH" -name "*.txt" 2>/dev/null | wc -l | tr -d ' ')
 if [[ "$GT_COUNT" -eq 0 ]]; then
@@ -193,14 +193,14 @@ echo -e "  ${DIM}Press Enter to skip.${NC}"
 read -rp "  Request: " USER_REQUEST
 echo ""
 
-USER_REQUEST_FILE="$REPO/migration_to/.cuga-migrator/user_request.md"
+USER_REQUEST_FILE="$REPO/.cuga-migrator/user_request.md"
 if [[ -n "$USER_REQUEST" ]]; then
     cat > "$USER_REQUEST_FILE" <<EOF
 # User Request
 
 $USER_REQUEST
 EOF
-    echo -e "${DIM}User request saved → migration_to/.cuga-migrator/user_request.md${NC}"
+    echo -e "${DIM}User request saved → .cuga-migrator/user_request.md${NC}"
 else
     # Clear any stale request from a previous run
     rm -f "$USER_REQUEST_FILE"
@@ -212,7 +212,7 @@ echo -e "${BOLD}Migration plan:${NC}"
 echo -e "  Source   ${CYAN}migration_from/$SOURCE_NAME${NC}"
 echo -e "  Target   ${CYAN}migration_to/$TARGET_NAME${NC}"
 echo -e "  SDK      ${DIM}cuga-agent/${NC}"
-echo -e "  State    ${DIM}migration_to/.cuga-migrator/${NC}"
+echo -e "  State    ${DIM}.cuga-migrator/${NC}"
 [[ -n "$STAGES" ]] && echo -e "  Stage(s) ${YELLOW}$STAGES only, in order (stage-only mode)${NC}"
 [[ -n "$USER_REQUEST" ]] && echo -e "  Request  ${YELLOW}$USER_REQUEST${NC}"
 echo ""

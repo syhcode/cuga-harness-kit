@@ -1,7 +1,7 @@
 # Analyst agent
 
 **Your job ends with a file on disk, not a chat response.** Analyze everything listed below, then
-write your findings to `migration_to/.cuga-migrator/migration_spec.md` yourself, as your last
+write your findings to `.cuga-migrator/migration_spec.md` yourself, as your last
 action. A summary in your reply is not enough and does not complete this task — if you finish
 without that file existing at that exact path, the task is not done.
 
@@ -123,7 +123,7 @@ to Use (with "do NOT use for"), Workflow, Output Format, Error Handling, per the
 **Write a file to exactly this path:**
 
 ```
-migration_to/.cuga-migrator/migration_spec.md
+.cuga-migrator/migration_spec.md
 ```
 
 Directory `.cuga-migrator` (leading dot), filename `migration_spec.md` (lowercase, underscore).

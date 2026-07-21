@@ -27,7 +27,7 @@ From inside Claude Code, `/source_sync <source-name>` or plain language (e.g. *"
 
 **(Optional) Add a user request to shape the migration**
 
-Create `migration_to/.cuga-migrator/user_request.md` to give the orchestrator persistent high-level intent. The orchestrator reads this before starting and surfaces it in every sub-agent prompt so it influences architecture choice, naming, and implementation decisions. Useful when you know upfront that you want a specific architecture (e.g. A2A delegation) or have naming conventions to enforce.
+Create `.cuga-migrator/user_request.md` to give the orchestrator persistent high-level intent. The orchestrator reads this before starting and surfaces it in every sub-agent prompt so it influences architecture choice, naming, and implementation decisions. Useful when you know upfront that you want a specific architecture (e.g. A2A delegation) or have naming conventions to enforce.
 
 Example:
 ```
@@ -162,7 +162,7 @@ cuga-templates/               # CUGA scaffolds — define the exact structure of
   a2a_supervisor_external/ # supervisor architecture (CugaSupervisor + external agents via A2A)
   one_agent/             # one_agent architecture (single CugaAgent + skills)
   tests/                 # test runner template
-migration_to/.cuga-migrator/    # pipeline state, spec, eval reports (auto-generated)
+.cuga-migrator/    # pipeline state, spec, eval reports (auto-generated)
   migration_spec.md             # analyst output: architecture design document
   source_summary.md             # analyst intermediate notes on the source repo
   state.json                    # pipeline progress tracker
@@ -182,7 +182,7 @@ Stages 4–5 loop up to 3 times. Human review gates occur after stage 1 and afte
 
 ## Providing hints to the migration
 
-### User request (`migration_to/.cuga-migrator/user_request.md`)
+### User request (`.cuga-migrator/user_request.md`)
 
 Create this file to express high-level intent for the migration. The orchestrator reads it before starting and passes it to every sub-agent so it shapes their decisions throughout the pipeline. Useful for:
 - Specifying the target architecture (`supervisor`, `a2a_supervisor_external`, `one_agent`)

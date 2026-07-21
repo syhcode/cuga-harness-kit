@@ -96,7 +96,7 @@ state:
 cd migration_to/cuga-agent && git rev-parse HEAD 2>/dev/null || echo "not-a-git-repo"
 ```
 
-Write `migration_to/.cuga-migrator/sync_report.md`:
+Write `.cuga-migrator/sync_report.md`:
 
 ```markdown
 # CUGA Sync Report

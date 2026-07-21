@@ -82,8 +82,8 @@ Reads the source repo, CUGA SDK, and templates to produce `migration_spec.md` �
 **Inputs:** source repo, CUGA SDK, templates, `migration_to/.env`
 
 **Outputs:**
-- `migration_to/.cuga-migrator/source_summary.md` — intermediate findings written before loading larger SDK files
-- `migration_to/.cuga-migrator/migration_spec.md` — full spec covering agents, MCP servers, policies, and skills
+- `.cuga-migrator/source_summary.md` — intermediate findings written before loading larger SDK files
+- `.cuga-migrator/migration_spec.md` — full spec covering agents, MCP servers, policies, and skills
 
 **Key responsibilities:**
 - Maps every source agent's workflow step-by-step, then traces each step to an MCP server, a CUGA config field, or a capability gap entry
@@ -195,7 +195,7 @@ Each command also has a matching **Skill** under `.claude/skills/<name>/SKILL.md
 
 The main pipeline orchestrator. Drives all five agents in sequence, copies templates before the implementer runs, checks `state.json` to skip already-completed stages on resume, pauses for user review after the spec and after implementation, and runs the eval–debug loop.
 
-**User request:** before starting, the orchestrator reads `migration_to/.cuga-migrator/user_request.md` if it exists. The request is surfaced explicitly in every sub-agent prompt so it shapes architecture choice, naming, and implementation decisions throughout the entire pipeline. Create this file to express high-level intent — e.g. "use A2A to orchestrate existing agents as external services" — before running `/migrate`.
+**User request:** before starting, the orchestrator reads `.cuga-migrator/user_request.md` if it exists. The request is surfaced explicitly in every sub-agent prompt so it shapes architecture choice, naming, and implementation decisions throughout the entire pipeline. Create this file to express high-level intent — e.g. "use A2A to orchestrate existing agents as external services" — before running `/migrate`.
 
 **Eval–debug loop:**
 
@@ -208,7 +208,7 @@ flowchart TD
     Check -->|No, cycle > 3| Escalate["Escalate to user"]
 ```
 
-State is written to `migration_to/.cuga-migrator/state.json` after each stage so the pipeline is resumable.
+State is written to `.cuga-migrator/state.json` after each stage so the pipeline is resumable.
 
 ---
 
@@ -230,9 +230,9 @@ State is written to `migration_to/.cuga-migrator/state.json` after each stage so
 
 **When to run:** whenever the CUGA SDK (`migration_to/cuga-agent/`) is updated.
 
-**What it does:** reads `sdk.py` and canonical SDK examples, compares every file under `cuga-templates/` against actual SDK behaviour, and fixes stale comments, wrong parameter names, or removed fields. Writes `migration_to/.cuga-migrator/sync_report.md` with a full accounting of every file checked and every change made.
+**What it does:** reads `sdk.py` and canonical SDK examples, compares every file under `cuga-templates/` against actual SDK behaviour, and fixes stale comments, wrong parameter names, or removed fields. Writes `.cuga-migrator/sync_report.md` with a full accounting of every file checked and every change made.
 
-**Output:** updated files under `cuga-templates/`, `migration_to/.cuga-migrator/sync_report.md`
+**Output:** updated files under `cuga-templates/`, `.cuga-migrator/sync_report.md`
 
 ---
 
@@ -240,7 +240,7 @@ State is written to `migration_to/.cuga-migrator/state.json` after each stage so
 
 ### `log_tool_use.sh` — `PreToolUse`
 
-Fires before every tool call across all agents and the orchestrator. Appends a JSON line to `migration_to/.cuga-migrator/logs/tool_log.jsonl`:
+Fires before every tool call across all agents and the orchestrator. Appends a JSON line to `.cuga-migrator/logs/tool_log.jsonl`:
 
 ```json
 {"ts": "2026-06-01T12:00:00Z", "agent": "analyst", "tool": "Read"}
@@ -297,18 +297,18 @@ cuga-migrator/
 │       └── .agents/skills/skill_template/SKILL.md
 │
 ├── migration_from/<source-name>/    # source repo (read-only)
-└── migration_to/
-    ├── cuga-agent/                  # CUGA SDK runtime (read-only)
-    ├── <target-name>/               # generated CUGA application
-    ├── data/
-    │   ├── ground_truth/            # trace .txt files (read-only)
-    │   └── prediction/              # eval outputs
-    └── .cuga-migrator/              # pipeline state and logs
-        ├── user_request.md          # (optional) user's high-level migration intent
-        ├── migration_spec.md        # analyst output
-        ├── source_summary.md        # analyst intermediate notes
-        ├── state.json               # pipeline progress tracker
-        └── sync_report.md           # cuga_sync output
+├── migration_to/
+│   ├── cuga-agent/                  # CUGA SDK runtime (read-only)
+│   ├── <target-name>/               # generated CUGA application
+│   └── data/
+│       ├── ground_truth/            # trace .txt files (read-only)
+│       └── prediction/              # eval outputs
+└── .cuga-migrator/                  # pipeline state and logs
+    ├── user_request.md              # (optional) user's high-level migration intent
+    ├── migration_spec.md            # analyst output
+    ├── source_summary.md            # analyst intermediate notes
+    ├── state.json                   # pipeline progress tracker
+    └── sync_report.md               # cuga_sync output
 ```
 
 ---

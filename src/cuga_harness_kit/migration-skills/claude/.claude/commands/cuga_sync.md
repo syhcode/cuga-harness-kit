@@ -190,7 +190,7 @@ cuga-templates/
 
 ## Sync report
 
-After all updates are done, write a brief sync report to `migration_to/.cuga-migrator/sync_report.md`.
+After all updates are done, write a brief sync report to `.cuga-migrator/sync_report.md`.
 
 Before writing, capture the cuga-agent commit SHA so future syncs can tell whether they're operating against the same SDK state:
 
