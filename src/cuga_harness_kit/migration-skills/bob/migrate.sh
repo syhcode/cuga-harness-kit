@@ -174,24 +174,14 @@ if [[ "$GT_COUNT" -eq 0 ]]; then
 fi
 
 # ── User request ──────────────────────────────────────────────────────────────
-echo -e "${BOLD}Any special requests for this migration?${NC}"
-echo -e "  ${DIM}(e.g. \"use one_agent architecture\", \"add extra error handling\")${NC}"
-echo -e "  ${DIM}Press Enter to skip.${NC}"
-read -rp "  Request: " USER_REQUEST
-echo ""
-
+# .cuga-migrator/user_request.md is a standing file, not a per-run prompt — edit it yourself
+# before running migrate.sh if you have a special request; the orchestrator reads it at the start
+# of every run regardless of whether it's empty. Create it with just the header if it's missing,
+# so it's discoverable without clobbering anything you've already written there.
 USER_REQUEST_FILE="$REPO/.cuga-migrator/user_request.md"
-if [[ -n "$USER_REQUEST" ]]; then
-    cat > "$USER_REQUEST_FILE" <<EOF
-# User Request
-
-$USER_REQUEST
-EOF
-    echo -e "${DIM}User request saved → .cuga-migrator/user_request.md${NC}"
-else
-    rm -f "$USER_REQUEST_FILE"
+if [[ ! -f "$USER_REQUEST_FILE" ]]; then
+    printf '# User Request\n' > "$USER_REQUEST_FILE"
 fi
-echo ""
 
 # ── Summary ────────────────────────────────────────────────────────────────────
 echo -e "${BOLD}Migration plan:${NC}"
@@ -199,8 +189,8 @@ echo -e "  Source   ${CYAN}migration_from/$SOURCE_NAME${NC}"
 echo -e "  Target   ${CYAN}migration_to/$TARGET_NAME${NC}"
 echo -e "  SDK      ${DIM}cuga-agent/${NC}"
 echo -e "  State    ${DIM}.cuga-migrator/${NC}"
+echo -e "  Request  ${DIM}.cuga-migrator/user_request.md (edit it before running to set one)${NC}"
 [[ -n "$STAGES" ]] && echo -e "  Stage(s) ${YELLOW}$STAGES only, in order (stage-only mode)${NC}"
-[[ -n "$USER_REQUEST" ]] && echo -e "  Request  ${YELLOW}$USER_REQUEST${NC}"
 echo ""
 
 # ── Run ──────────────────────────────────────────────────────────────────────

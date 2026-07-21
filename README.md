@@ -83,10 +83,13 @@ cuga-harness-kit init --targets claude --migration   # or --targets bob
 
 This additionally scaffolds `.claude/commands/migrate.md`, `.claude/agents/*.md` (the 5 subagents),
 the `cuga-migrator` / `cuga-source-sync` / `cuga-template-sync` skills, `cuga-templates/`,
-`migrate.sh` / `source_sync.sh` / `cuga_sync.sh`, and `migration_from/`/`migration_to/` — then
-`git clone`s the [cuga SDK](https://github.com/cuga-project/cuga-agent) into
-`migration_to/cuga-agent/` (shallow, `--depth 1`), which the pipeline's own agents/skills read
-directly (e.g. `migration_to/cuga-agent/src/cuga/sdk.py`).
+`migrate.sh` / `source_sync.sh` / `cuga_sync.sh`, `migration_from/`/`migration_to/`, and an empty
+`.cuga-migrator/user_request.md` (a standing file, not a per-run prompt — edit it yourself to give
+the orchestrator persistent intent; it's read at the start of every run and, unlike everything else
+here, is never overwritten by `init --force`/`update` once it exists) — then `git clone`s the
+[cuga SDK](https://github.com/cuga-project/cuga-agent) into `migration_to/cuga-agent/` (shallow,
+`--depth 1`), which the pipeline's own agents/skills read directly (e.g.
+`migration_to/cuga-agent/src/cuga/sdk.py`).
 
 - Only `claude` and `bob` support it — the pipeline needs subagent/orchestration primitives Cursor
   and Codex don't have. `--migration` with only `cursor`/`codex` in `--targets` prints a notice

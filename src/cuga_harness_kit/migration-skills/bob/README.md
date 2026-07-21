@@ -47,9 +47,10 @@ Or run `./source_sync.sh <source-name>` — see "Launch scripts" below.
 
 **(Optional) Add a user request to shape the migration**
 
-Create `.cuga-migrator/user_request.md` to give the orchestrator persistent
-high-level intent. It's read before the pipeline starts and surfaced in every stage's subagent
-prompt, so it influences architecture choice, naming, and implementation decisions. Example:
+`.cuga-migrator/user_request.md` already exists (created empty, just the header) — edit it to give
+the orchestrator persistent high-level intent. It's a standing file, not a per-run prompt: it's
+read before every pipeline run, even when empty, and surfaced in every stage's subagent prompt, so
+it influences architecture choice, naming, and implementation decisions. Example:
 
 ```
 # User Request

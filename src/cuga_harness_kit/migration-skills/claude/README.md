@@ -27,7 +27,7 @@ From inside Claude Code, `/source_sync <source-name>` or plain language (e.g. *"
 
 **(Optional) Add a user request to shape the migration**
 
-Create `.cuga-migrator/user_request.md` to give the orchestrator persistent high-level intent. The orchestrator reads this before starting and surfaces it in every sub-agent prompt so it influences architecture choice, naming, and implementation decisions. Useful when you know upfront that you want a specific architecture (e.g. A2A delegation) or have naming conventions to enforce.
+`.cuga-migrator/user_request.md` already exists (created empty, just the header) — edit it to give the orchestrator persistent high-level intent. It's a standing file, not a per-run prompt: the orchestrator reads it before starting every run, even when it's empty, and surfaces it in every sub-agent prompt so it influences architecture choice, naming, and implementation decisions. Useful when you know upfront that you want a specific architecture (e.g. A2A delegation) or have naming conventions to enforce.
 
 Example:
 ```

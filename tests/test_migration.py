@@ -112,6 +112,30 @@ def test_scaffold_migration_leaves_existing_migration_from_alone(tmp_path, fake_
     assert not (cwd / "migration_from" / ".gitkeep").exists()
 
 
+def test_scaffold_migration_creates_empty_user_request_placeholder(tmp_path, fake_kit):
+    cwd = tmp_path / "project"
+    cwd.mkdir()
+
+    written, _ = _scaffold(cwd, force=False, dry_run=False)
+
+    request_file = cwd / ".cuga-migrator" / "user_request.md"
+    assert request_file.read_text() == "# User Request\n"
+    assert str(request_file) in written
+
+
+def test_scaffold_migration_never_overwrites_existing_user_request(tmp_path, fake_kit):
+    cwd = tmp_path / "project"
+    request_file = cwd / ".cuga-migrator" / "user_request.md"
+    request_file.parent.mkdir(parents=True)
+    request_file.write_text("# User Request\nuse the one_agent architecture\n")
+
+    written, skipped = _scaffold(cwd, force=True, dry_run=False)
+
+    assert request_file.read_text() == "# User Request\nuse the one_agent architecture\n"
+    assert str(request_file) not in written
+    assert any(str(request_file) in line for line in skipped)
+
+
 def test_clone_cuga_sdk_clones(tmp_path, fake_cuga_repo):
     cwd = tmp_path / "project"
     cwd.mkdir()

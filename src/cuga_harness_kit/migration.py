@@ -60,6 +60,26 @@ def scaffold_migration(
         migration_from.mkdir(parents=True, exist_ok=True)
         (migration_from / ".gitkeep").touch()
 
+    _ensure_user_request_file(cwd, written=written, skipped=skipped)
+
+
+def _ensure_user_request_file(cwd: Path, *, written: list[str], skipped: list[str]) -> None:
+    """Create .cuga-migrator/user_request.md with just its header if it doesn't exist yet.
+
+    This is a standing file the user edits directly (not a per-run prompt) — the orchestrator
+    reads it at the start of every migration run, even when it's empty. It's created here only so
+    it's discoverable right after scaffolding, the same way CLAUDE.md/AGENTS.md are. Deliberately
+    bypasses write_file's --force semantics: this file holds a user's own, possibly in-progress
+    request, and must never be overwritten by `init`/`update` once it exists.
+    """
+    request_file = cwd / ".cuga-migrator" / "user_request.md"
+    if request_file.exists():
+        skipped.append(f"{request_file} (already exists — never overwritten by init/update)")
+        return
+    request_file.parent.mkdir(parents=True, exist_ok=True)
+    request_file.write_text("# User Request\n")
+    written.append(str(request_file))
+
 
 def clone_cuga_sdk(cwd: Path, *, ref: str | None) -> None:
     sdk_dest = cwd / SDK_SUBDIR
