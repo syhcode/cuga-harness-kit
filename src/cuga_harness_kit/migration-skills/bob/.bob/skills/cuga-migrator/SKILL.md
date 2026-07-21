@@ -69,10 +69,12 @@ Create `.cuga-migrator/` and `migration_to/<target_name>/` if they don't exist.
 
 ## User request
 
-Before doing anything else, check if `.cuga-migrator/user_request.md` exists. If it
-does, read it. Keep the user's request in mind throughout the entire pipeline and pass it into
-every subagent prompt below so it shapes their decisions (architecture choice, naming, error
-handling, etc.).
+Before doing anything else, check if `.cuga-migrator/user_request.md` exists. If it does, read it
+— its full contents go into the analyst subagent's prompt below as the "User request" input,
+verbatim, whether it's empty or not. The analyst is responsible for folding it into
+`migration_spec.md` (architecture choice in `## Architecture`, everything else in `## Notes`) —
+every downstream stage reads the spec, not this file directly, so what the analyst writes there is
+the request's only path into the rest of the pipeline.
 
 ## Resuming
 

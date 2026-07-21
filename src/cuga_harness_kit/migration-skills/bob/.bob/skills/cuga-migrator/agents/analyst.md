@@ -10,7 +10,7 @@ You are the ANALYST in a CUGA migration pipeline. You will be given:
 - CUGA SDK path: `migration_to/cuga-agent/`
 - Templates path: `cuga-templates/`
 - CUGA env file: `migration_to/.env`
-- User request (if any): `<contents of user_request.md, or "none">`
+- User request (if any): `<contents of .cuga-migrator/user_request.md, or "none">`
 
 ## 1. Read and understand — inputs and constraints
 
@@ -69,7 +69,12 @@ constraints → `intent_guard`, tool usage guidance → `tool_guide`.
 ## 2. Choose an architecture
 
 Check the user request first — it may specify the target architecture or override inference from
-the source alone. Then choose one, with written rationale for the `## Architecture` section:
+the source alone. Then choose one, with written rationale for the `## Architecture` section.
+
+Downstream stages (implementer, test_writer, evaluator, debugger) never see the raw user request —
+they only read this spec. **Any part of the request that isn't purely an architecture choice —
+naming conventions, error-handling preferences, reuse constraints, anything else — must be written
+into `## Notes` explicitly**, in your own words, or it's lost for the rest of the pipeline.
 
 | Architecture | Template | When to choose |
 |---|---|---|
