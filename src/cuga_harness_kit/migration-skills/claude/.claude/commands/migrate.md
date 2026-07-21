@@ -38,7 +38,7 @@ Create `.cuga-migrator/` and `migration_to/<target_name>/` if they don't exist.
 
 ## User Request
 
-Before doing anything else, check if `.cuga-migrator/user_request.md` exists. If it does, read it. Keep the user's request in mind throughout the entire pipeline and surface it explicitly in every sub-agent prompt so it shapes their decisions (architecture choice, naming, error handling, etc.).
+Before doing anything else, check if `.cuga-migrator/user_request.md` exists. If it does, read it — its full contents go into the analyst's prompt below as the "User request" input, verbatim, whether it's empty or not. The analyst is responsible for folding it into `migration_spec.md` (architecture choice in `## Architecture`, everything else in `## Notes`) — every downstream stage reads the spec, not this file directly, so what the analyst writes there is the request's only path into the rest of the pipeline.
 
 ## Pipeline (adapt dynamically — do not follow blindly)
 
@@ -52,6 +52,7 @@ Call `Agent(agent_name="analyst", prompt="...")` with:
 - SDK reference (one_agent): `migration_to/cuga-agent/docs/examples/cuga_with_runtime_tools/`
 - Spec output path: `.cuga-migrator/migration_spec.md`
 - CUGA env file: `migration_to/.env`
+- User request (if any): `<contents of .cuga-migrator/user_request.md, or "none">`
 
 After completion, **read `.cuga-migrator/migration_spec.md`** and assess:
 - How many agents, MCP servers, policies?

@@ -17,6 +17,7 @@ The orchestrator will give you:
 - Templates path (`cuga-templates/`)
 - Output path for the spec markdown file
 - CUGA env file: `migration_to/.env`
+- User request (if any): `<contents of .cuga-migrator/user_request.md, or "none">`
 
 ## What to do
 
@@ -76,7 +77,9 @@ Design these policies in the `## Policies` section of the spec. The supervisor's
 
 ### 2. Choose an architecture
 
-**First, check `user_request.md`.** If the orchestrator passed a user request, read it before making any decision. It may specify a target architecture, name constraints, reuse preferences, or other intent that should override what you would infer from the source alone. Factor it into every choice below.
+**First, check the user request the orchestrator gave you.** It may specify a target architecture, name constraints, reuse preferences, or other intent that should override what you would infer from the source alone. Factor it into every choice below.
+
+Downstream stages (implementer, test_writer, evaluator, debugger) never see the raw user request — they only read this spec. **Any part of the request that isn't purely an architecture choice — naming conventions, error-handling preferences, reuse constraints, anything else — must be written into `## Notes` explicitly**, in your own words, or it's lost for the rest of the pipeline.
 
 Based on the user request (if any) and your understanding of both the source and CUGA patterns, choose one of three architectures. Write your rationale — it becomes the `## Architecture` section of the spec.
 
