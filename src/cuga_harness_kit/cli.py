@@ -89,36 +89,37 @@ def init(
 
     print(_detect_cuga_message(cwd))
 
-    if "claude" in targets:
-        for skill_path in skill_paths:
-            src = skill_path / "SKILL.md"
-            dest = cwd / ".claude" / "skills" / skill_path.name / "SKILL.md"
-            _write_file(dest, src.read_text(), force=force, dry_run=dry_run, written=written, skipped=skipped)
+    if not with_migration:
+        if "claude" in targets:
+            for skill_path in skill_paths:
+                src = skill_path / "SKILL.md"
+                dest = cwd / ".claude" / "skills" / skill_path.name / "SKILL.md"
+                _write_file(dest, src.read_text(), force=force, dry_run=dry_run, written=written, skipped=skipped)
 
-    if "cursor" in targets:
-        for skill_path in skill_paths:
-            src = skill_path / "SKILL.md"
-            dest = cwd / ".cursor" / "rules" / f"cuga-{skill_path.name}.mdc"
-            _write_file(dest, render_mdc(src), force=force, dry_run=dry_run, written=written, skipped=skipped)
+        if "cursor" in targets:
+            for skill_path in skill_paths:
+                src = skill_path / "SKILL.md"
+                dest = cwd / ".cursor" / "rules" / f"cuga-{skill_path.name}.mdc"
+                _write_file(dest, render_mdc(src), force=force, dry_run=dry_run, written=written, skipped=skipped)
 
-    if "codex" in targets:
-        _write_agents_md(cwd, [p / "SKILL.md" for p in skill_paths], dry_run=dry_run, written=written, skipped=skipped)
+        if "codex" in targets:
+            _write_agents_md(cwd, [p / "SKILL.md" for p in skill_paths], dry_run=dry_run, written=written, skipped=skipped)
 
-    if "bob" in targets:
-        for skill_path in skill_paths:
-            src = skill_path / "SKILL.md"
-            dest = cwd / ".bob" / "skills" / skill_path.name / "SKILL.md"
-            _write_file(dest, src.read_text(), force=force, dry_run=dry_run, written=written, skipped=skipped)
+        if "bob" in targets:
+            for skill_path in skill_paths:
+                src = skill_path / "SKILL.md"
+                dest = cwd / ".bob" / "skills" / skill_path.name / "SKILL.md"
+                _write_file(dest, src.read_text(), force=force, dry_run=dry_run, written=written, skipped=skipped)
 
-    env_doc = DOCS_DIR / "env-api-keys.md"
-    _write_file(
-        cwd / "docs" / "cuga-env-api-keys.md",
-        env_doc.read_text(),
-        force=force,
-        dry_run=dry_run,
-        written=written,
-        skipped=skipped,
-    )
+        env_doc = DOCS_DIR / "env-api-keys.md"
+        _write_file(
+            cwd / "docs" / "cuga-env-api-keys.md",
+            env_doc.read_text(),
+            force=force,
+            dry_run=dry_run,
+            written=written,
+            skipped=skipped,
+        )
 
     if with_migration:
         migration_targets = [t for t in targets if t in migration.MIGRATION_TARGETS]
@@ -140,10 +141,16 @@ def init(
         print(f"  wrote:    {line}")
     for line in skipped:
         print(f"  skipped:  {line}")
-    print(
-        '\nNext step: open this folder in Claude Code, Cursor, Codex, or Bob, and try asking '
-        '"help me build a cuga tool" or "how do I launch cuga".'
-    )
+    if with_migration:
+        print(
+            '\nNext step: cp .env.example .env, add a source repo under migration_from/<name>/, then '
+            'run `cuga-harness-kit migrate <name> <target-name>` (or ask Claude Code / Bob directly).'
+        )
+    else:
+        print(
+            '\nNext step: open this folder in Claude Code, Cursor, Codex, or Bob, and try asking '
+            '"help me build a cuga tool" or "how do I launch cuga".'
+        )
 
 
 def _add_targets_arg(subparser: argparse.ArgumentParser) -> None:
@@ -156,7 +163,10 @@ def _add_targets_arg(subparser: argparse.ArgumentParser) -> None:
     subparser.add_argument(
         "--migration",
         action="store_true",
-        help=f"also scaffold the cuga-migrator pipeline (skills, subagents, launch scripts) for {migration.MIGRATION_TARGETS}",
+        help=(
+            "scaffold the cuga-migrator pipeline (skills, subagents, launch scripts) for "
+            f"{migration.MIGRATION_TARGETS} instead of the plain guidance skills"
+        ),
     )
     subparser.add_argument(
         "--skip-sdk", action="store_true", help="with --migration, don't clone the cuga SDK into migration_to/cuga-agent/"

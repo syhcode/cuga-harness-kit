@@ -68,7 +68,10 @@ cuga-harness-kit update [--targets claude,cursor,codex,bob] [--dry-run] [--migra
 Besides the 8 guidance skills, this kit also ships the **cuga-migrator** pipeline — a separate,
 heavier tool that converts a *different* source agent system into a cuga SDK implementation,
 using a 5-stage subagent pipeline (analyst → implementer → test_writer → evaluator → debugger).
-It's opt-in: plain `init` never touches it. Its canonical, hand-maintained source lives under
+It's opt-in and **exclusive**: `init --migration` scaffolds *only* the migration pipeline for the
+given `--targets`, not the 8 guidance skills (they're two different workflows — run `init` a
+second time without `--migration` if you want both in the same project). Its canonical,
+hand-maintained source lives under
 `src/cuga_harness_kit/migration-skills/{claude,bob}/` (plus the shared `cuga-templates/` alongside
 them) — a separate boundary from the plain guidance skills, since this content is a full
 standalone project (subagents, launch scripts, its own directory layout) rather than a single
