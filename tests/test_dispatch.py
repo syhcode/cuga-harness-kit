@@ -16,7 +16,7 @@ def _make_script(cwd, script_name, body):
 
 def test_run_missing_script_exits(tmp_path):
     with pytest.raises(SystemExit):
-        dispatch.run("migrate", [], cwd=tmp_path)
+        dispatch.run("run", [], cwd=tmp_path)
 
 
 def test_run_forwards_args_and_exit_code(tmp_path):
@@ -26,7 +26,7 @@ def test_run_forwards_args_and_exit_code(tmp_path):
         "#!/usr/bin/env bash\necho \"args: $@\" > out.txt\nexit 7\n",
     )
 
-    code = dispatch.run("migrate", ["cp4i-res", "cp4i-cuga"], cwd=tmp_path)
+    code = dispatch.run("run", ["cp4i-res", "cp4i-cuga"], cwd=tmp_path)
 
     assert code == 7
     assert (tmp_path / "out.txt").read_text().strip() == "args: cp4i-res cp4i-cuga"

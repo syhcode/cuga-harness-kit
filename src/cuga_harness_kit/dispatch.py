@@ -1,4 +1,4 @@
-"""`cuga-harness-kit migrate|source_sync|cuga_sync` — run the corresponding launch script in the
+"""`cuga-harness-kit migrate run|source_sync|cuga_sync` — run the corresponding launch script in the
 current directory (which `init --migration` scaffolds a migration kit's content directly into).
 """
 
@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-SCRIPTS = {"migrate": "migrate.sh", "source_sync": "source_sync.sh", "cuga_sync": "cuga_sync.sh"}
+SCRIPTS = {"source_sync": "source_sync.sh", "cuga_sync": "cuga_sync.sh", "run": "migrate.sh"}
 
 
 def run(command: str, args: list[str], cwd: Path | None = None) -> int:

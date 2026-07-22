@@ -75,12 +75,13 @@ cuga-harness-kit init --targets claude --migration   # or --targets bob
 
 This scaffolds the migration skills/agents, launch scripts, `cuga-templates/`, and
 `migration_from/`/`migration_to/`, then clones the [cuga SDK](https://github.com/cuga-project/cuga-agent)
-for the pipeline to reference. Once scaffolded, three more subcommands become available:
+for the pipeline to reference. Once scaffolded, three more subcommands become available, grouped
+under `migrate`:
 
 ```bash
-cuga-harness-kit migrate <source-name> <target-name>
-cuga-harness-kit source_sync <source-name>
-cuga-harness-kit cuga_sync
+cuga-harness-kit migrate source_sync <source-name>
+cuga-harness-kit migrate cuga_sync
+cuga-harness-kit migrate run <source-name> <target-name>
 ```
 
 You can also just ask Claude Code / Bob directly, in natural language. See the scaffolded kit's

@@ -144,7 +144,7 @@ def init(
     if with_migration:
         print(
             '\nNext step: cp .env.example .env, add a source repo under migration_from/<name>/, then '
-            'run `cuga-harness-kit migrate <name> <target-name>` (or ask Claude Code / Bob directly).'
+            'run `cuga-harness-kit migrate run <name> <target-name>` (or ask Claude Code / Bob directly).'
         )
     else:
         print(
@@ -191,12 +191,16 @@ def main(argv: list[str] | None = None) -> None:
     )
     _add_targets_arg(update_parser)
 
+    migrate_parser = subparsers.add_parser(
+        "migrate", help="migration pipeline commands (needs `init --migration` first)"
+    )
+    migrate_subparsers = migrate_parser.add_subparsers(dest="migrate_command", required=True)
     for command, help_text in (
-        ("migrate", "run the migration pipeline in the current directory (needs `init --migration` first)"),
         ("source_sync", "scout a migration source repo and write its CLAUDE.md"),
         ("cuga_sync", "sync cuga-templates/ against the cloned cuga SDK"),
+        ("run", "run the full migration pipeline (or --stages) for <source> <target>"),
     ):
-        sub = subparsers.add_parser(command, help=help_text)
+        sub = migrate_subparsers.add_parser(command, help=help_text)
         sub.add_argument("args", nargs=argparse.REMAINDER, help="arguments forwarded to the underlying script")
 
     args = parser.parse_args(argv)
@@ -217,7 +221,7 @@ def main(argv: list[str] | None = None) -> None:
         )
         return
 
-    sys.exit(dispatch.run(args.command, args.args, cwd=Path.cwd()))
+    sys.exit(dispatch.run(args.migrate_command, args.args, cwd=Path.cwd()))
 
 
 if __name__ == "__main__":
