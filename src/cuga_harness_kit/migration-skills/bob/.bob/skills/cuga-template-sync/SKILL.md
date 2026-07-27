@@ -26,9 +26,14 @@ version — before starting a migration.
 
 1. **`migration_to/cuga-agent/src/cuga/sdk.py`** — the authoritative source. Extract every
    accepted parameter (with type + docstring) of `CugaSupervisor.__init__()` and
-   `CugaAgent.__init__()`. Find how `supervisor_config.yaml` / `agent_config.yaml` are parsed —
-   list every YAML field actually consumed. Determine which component loads policies
-   (`cuga_folder`, `auto_load_policies`).
+   `CugaAgent.__init__()`. In particular, confirm (don't assume) whether `CugaSupervisor`
+   accepts `tool_provider` and any policy-related kwargs (`policy_system`, `cuga_folder`,
+   `auto_load_policies`, `reset_policy_storage`, `filesystem_sync`) and exposes a `.policies`
+   manager property — these are easy to wrongly assume are agent-only. Find how
+   `supervisor_config.yaml` / `agent_config.yaml` are parsed — list every YAML field actually
+   consumed. Determine which component loads policies (`cuga_folder`, `auto_load_policies`) —
+   note that `CugaSupervisor` can hold its OWN policies independently of any sub-agent; don't
+   default to "policies always belong to sub-agents" without checking.
 2. **`.../supervisor_utils/supervisor_config.py`** (or wherever `load_supervisor_config` lives) —
    confirm exactly which top-level YAML keys it consumes vs. ignores. This is the source of truth
    for the YAML schema.
@@ -43,6 +48,42 @@ version — before starting a migration.
 
 </Step>
 
+<Step title="1b. Capability matrix — build this fresh every sync, never from memory">
+
+CUGA has exactly three capability axes that templates make constraint claims about: **tools**,
+**policies**, and **skills**. Both `CugaAgent` and `CugaSupervisor` can independently support or
+lack each one, and which is which is a fact about the *current* SDK version, not a fixed rule —
+it can change release to release. Before checking any template file, re-read
+`CugaAgent.__init__()` and `CugaSupervisor.__init__()` in `sdk.py` and fill in this table from
+scratch, citing the exact `__init__` line for every cell (do not carry over a previous sync's
+answers):
+
+| Capability | CugaAgent — supports? (params, file:line) | CugaSupervisor — supports? (params, file:line) |
+|---|---|---|
+| Direct tools | ? | ? |
+| Policies (`.cuga/`) | ? | ? |
+| Skills (`SKILL.md`) | ? | ? |
+
+For each cell, answer only from what the constructor signature actually accepts (plus, for
+policies/skills, whether a `.policies`-style manager or loader method exists) — not from what any
+template currently does. A class lacking a parameter for a capability is a hard "no"; a class
+having the parameter but no template currently passing it is a "yes, unused by convention."
+
+Use the finished matrix as the single source of truth for grading every constraint comment in
+every template file that makes an "X does/doesn't support tools/policies/skills" claim: matches →
+confirmed accurate; comment says impossible but matrix says supported → rewrite the comment to
+plainly state, in your own words based on what you verify that sync, what the template currently
+has configured for that capability and — if unused — which kwarg would turn it on (and check
+whether the entrypoint silently relies on something that no-ops, e.g. a plain env var the
+constructor never reads instead of the real kwarg); comment says supported but matrix says no such
+param → fix the comment the other direction. State only the fact you just verified from the live
+SDK/template that sync — never frame it as "a design choice, not an SDK limitation," and don't
+reference what the comment used to say; that kind of before/after narrative belongs in the sync
+report, not the template file. Apply this the same way to all three axes — don't special-case
+tools or policies over skills.
+
+</Step>
+
 <Step title="2. Check every file under cuga-templates/ for drift">
 
 For each `*_config.yaml` (supervisor, a2a_supervisor_external, one_agent): enumerate every
@@ -52,6 +93,7 @@ common dead suspects: `supervisor.strategy`, `supervisor.mode`). Verify YAML ↔
 consistency both directions — a key the SDK would consume via `from_yaml` but the template's
 manual loader silently drops is a silent-drift bug; fix it. Confirm constraint comments are
 accurate (e.g. if `special_instructions` IS consumed, the comment must say so, not "DO NOT add").
+Grade any tools/policies/skills capability claim against the matrix above, cell by cell.
 
 For each `*_entrypoint.py`: import paths match current SDK package structure; constructor calls
 use only parameters that actually exist; no deprecated/removed parameters referenced; every
@@ -81,9 +123,12 @@ For `cuga-templates/README.md`: file listing and descriptions still match what's
 <Step title="3. Update — minimal, targeted edits">
 
 Edit only the parts that are wrong or outdated; do not rewrite entire files. When fixing a
-comment, replace it with the accurate one in the same style. If the SDK added a new field, add a
-commented-out example line with a `{{PLACEHOLDER}}` note. If a field was removed, remove it (with
-a brief inline comment explaining the removal if it prevents confusion).
+comment, replace it with one that plainly states the current, correct fact — a reader opening the
+template fresh should see only accurate, present-tense documentation of what it does now, not
+"previously this said...", "this used to be...", or "design choice vs SDK limitation" narration.
+Keep any before/after story in the sync report. If the SDK added a new field, add a commented-out
+example line with a `{{PLACEHOLDER}}` note. If a field was removed, remove it (with a brief inline
+comment explaining the removal if it prevents confusion).
 
 </Step>
 

@@ -28,9 +28,15 @@ from cuga import CugaSupervisor
 
 _HERE = Path(__file__).parent
 _CONFIG = _HERE / "supervisor_config.yaml"
+_CUGA_FOLDER = str(_HERE / ".cuga")
 
-# Point CUGA's policy engine at the local .cuga/ folder.
-os.environ.setdefault("CUGA_FOLDER", str(_HERE / ".cuga"))
+# CUGA_FOLDER (plain env var) is read by the CugaLite/skills runtime paths, but NOT by
+# CugaSupervisor's own policy engine — that only reads the `cuga_folder=` constructor
+# kwarg passed below (or falls back to the relative `settings.policy.cuga_folder`
+# default, which breaks if the process CWD != this directory). Set both so policy
+# loading (.cuga/intent_guards, playbooks, output_formatters, tool_guides) works
+# regardless of where this script is launched from.
+os.environ.setdefault("CUGA_FOLDER", _CUGA_FOLDER)
 
 
 class MySupervisor:  # {{PLACEHOLDER: rename to match the spec's supervisor class name}}
@@ -57,9 +63,15 @@ class MySupervisor:  # {{PLACEHOLDER: rename to match the spec's supervisor clas
                 logger.warning(f"Skipping agent without a2a_protocol.enabled: {name}")
 
         supervisor_cfg = config.get("supervisor", {})
+        # cuga_folder= (absolute path) makes policy auto-loading (auto_load_policies
+        # defaults to True via settings.policy.auto_load_policies) find .cuga/ regardless
+        # of the process's current working directory. There are no internal CugaAgent
+        # sub-agents in this template to attach policies to (all agents are external A2A
+        # services) — policies here apply to the supervisor itself.
         supervisor = CugaSupervisor(
             agents=agents,
             special_instructions=supervisor_cfg.get("special_instructions"),
+            cuga_folder=_CUGA_FOLDER,
         )
         return cls(supervisor)
 

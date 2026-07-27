@@ -49,7 +49,7 @@ cuga-templates/
 │           └── tool_guide_a2a_delegation.md
 ├── one_agent/                           # Single-agent architecture (CugaAgent + skills)
 │   ├── agent_config.yaml                # MCP server registry
-│   ├── agent_entrypoint.py              # CugaAgent entrypoint; loads all tools, enable_knowledge=True
+│   ├── agent_entrypoint.py              # CugaAgent entrypoint; loads all tools, enable_knowledge=True, enable_skills=True
 │   ├── mcp_servers/
 │   │   └── mcp_server_template.py       # FastMCP server stub — one file per external data source
 │   ├── scripts/
@@ -72,9 +72,14 @@ cuga-templates/
 
 ## Key constraints (encoded in the template files themselves)
 
-- **`CugaSupervisor` itself has no tools** — `CugaSupervisor.__init__` accepts no `tools`
-  parameter. All tool execution happens inside sub-agents (`CugaAgent` instances or A2A servers).
-  The supervisor LLM only routes and orchestrates; it never calls tools directly.
+- **`CugaSupervisor` CAN have its own direct tools** — `CugaSupervisor.__init__` accepts a
+  `tool_provider=` kwarg (a `ToolProviderInterface`, not a `tools=` list; `sdk.py:2971-3048`).
+  Tools from it are exposed to the supervisor LLM and made directly callable exactly like
+  `delegate_to_<agent>()` functions (`cuga_supervisor/nodes/prepare_agents_and_prompt.py:222-236`).
+  **Neither `supervisor/` nor `a2a_supervisor_external/` wires this up** — both templates
+  route 100% of tool access through sub-agents. To give the supervisor itself directly
+  callable tools, pass `tool_provider=` to `CugaSupervisor(...)` in
+  `supervisor_entrypoint.py` rather than adding a new sub-agent.
 
 - **Sub-agent tool configuration (internal agents)** — each agent entry in `supervisor_config.yaml`
   can declare its own tools via any of these keys (processed by `load_supervisor_config`):
@@ -102,3 +107,12 @@ cuga-templates/
 
 - **Policies** — live in `.cuga/<type_plural>/`. Types: `intent_guards`, `playbooks`,
   `output_formatters`, `tool_guides`, `tool_approvals`. See existing examples for the YAML frontmatter format.
+
+- **Skills gotcha (`one_agent/` only)** — `SKILL.md` files are OFF by default
+  (`settings.skills.enabled = false`) and, even when enabled, are discovered from
+  `.cuga/skills/` by default (`settings.skills.root = "cuga"`), NOT `.agents/skills/`
+  where `skill_template/` lives. `agent_entrypoint.py` must set both
+  `enable_skills=True` on `CugaAgent(...)` *and* `DYNACONF_SKILLS__ROOT=agents`
+  **before the first `cuga` import** (dynaconf resolves `DYNACONF_*` env vars at
+  Settings-construction time, not per-access — setting it inside `create()` is too
+  late). Both are already wired in the template; don't remove them.

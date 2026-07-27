@@ -22,11 +22,16 @@ You are the **CUGA Template Sync Agent**. Your job is to read the current CUGA S
 Read these SDK files carefully before touching any template:
 
 1. **`migration_to/cuga-agent/src/cuga/sdk.py`** — the authoritative source. Extract:
-   - `CugaSupervisor.__init__()` — every accepted parameter with its type and docstring
+   - `CugaSupervisor.__init__()` — every accepted parameter with its type and docstring. In
+     particular, confirm (don't assume) whether it accepts `tool_provider` and any policy-related
+     kwargs (`policy_system`, `cuga_folder`, `auto_load_policies`, `reset_policy_storage`,
+     `filesystem_sync`) and whether it exposes a `.policies` manager property — these are easy to
+     wrongly assume are agent-only. A template not *using* one of these is a design choice; the
+     template's own comments must say so explicitly rather than claiming the SDK doesn't support it.
    - `CugaAgent.__init__()` — every accepted parameter with its type and docstring
    - How `supervisor_config.yaml` is parsed: search for `from_yaml`, `from_config`, or any method that reads YAML into a supervisor/agent. List every YAML field that is actually consumed.
    - How `agent_config.yaml` is parsed: same as above.
-   - Which component loads policies (`cuga_folder`, `auto_load_policies`) — supervisor or agent or both?
+   - Which component loads policies (`cuga_folder`, `auto_load_policies`) — supervisor or agent or both? Note that `CugaSupervisor` can hold its OWN policies independently of any sub-agent (verify against its `__init__` signature) — do not default to "policies always belong to sub-agents" without checking.
 
 2. **`migration_to/cuga-agent/src/cuga/supervisor_utils/supervisor_config.py`** (or wherever `load_supervisor_config` lives) — confirm exactly which top-level YAML keys it consumes vs. ignores. The list of keys SDK code touches is the source of truth for the YAML schema; everything else is decorative or dead.
 
@@ -37,6 +42,46 @@ Read these SDK files carefully before touching any template:
 5. **`migration_to/cuga-agent/docs/examples/travel_agent/`** — the canonical supervisor example. Read every file to understand current best-practice patterns. Treat as a secondary reference: examples themselves can lag `sdk.py`, so cross-check before treating them as ground truth.
 
 6. **`migration_to/cuga-agent/docs/examples/cuga_with_runtime_tools/`** — the canonical one_agent example. Same caveat.
+
+## Capability matrix — build this fresh every sync, never from memory
+
+CUGA has exactly three capability axes that templates make constraint claims about: **tools**,
+**policies**, and **skills**. Both `CugaAgent` and `CugaSupervisor` can independently support or
+lack each one, and which is which is a fact about the *current* SDK version, not a fixed rule —
+it can change release to release. So every sync, before checking any template file, re-read
+`CugaAgent.__init__()` and `CugaSupervisor.__init__()` in `sdk.py` and fill in this table from
+scratch, citing the exact `__init__` line for every cell (do not carry over a previous sync's
+answers, and do not reuse the example values below — they are illustrative only and may already
+be stale by the time you read this):
+
+| Capability | CugaAgent — supports? (params, file:line) | CugaSupervisor — supports? (params, file:line) |
+|---|---|---|
+| Direct tools | ? | ? |
+| Policies (`.cuga/`) | ? | ? |
+| Skills (`SKILL.md`) | ? | ? |
+
+For each cell, answer only from what the constructor signature actually accepts (plus, for
+policies/skills, whether a `.policies`/`.skills`-style manager or loader method exists on the
+class) — not from what any template currently does or from what a docstring narrative implies.
+A class lacking a parameter for a capability is a hard "no"; a class having the parameter but no
+template currently passing it is a "yes, unused by convention."
+
+Once the matrix is filled in, use it as the single source of truth for grading every constraint
+comment in every template file (`supervisor/`, `a2a_supervisor_external/`, `one_agent/`) that
+makes an "X does/doesn't support tools/policies/skills" claim about either class:
+- If the comment's claim matches the matrix cell exactly → confirmed accurate, no change.
+- If the comment claims a capability is impossible/unsupported but the matrix cell says the class
+  *does* accept it → this is drift. Fix the comment to state the true capability, and separately
+  note whether the template's own entrypoint code actually wires it up (a template can validly
+  choose not to use a capability the SDK offers — that's a design choice and must be labeled as
+  such, not conflated with "the SDK doesn't support this").
+- If the comment claims a capability works but the matrix says the class has no such parameter →
+  this is drift in the other direction; fix the comment and check whether the entrypoint code is
+  relying on something that silently no-ops (e.g. setting a plain env var the constructor never
+  reads instead of passing the real kwarg).
+
+This matrix-first approach applies uniformly to all three axes — do not special-case tools or
+policies over skills or vice versa; check all three the same way, every time.
 
 ## What to check and fix
 
@@ -88,6 +133,7 @@ cuga-templates/
   - Mark it as **DEAD** and remove it from the template. A key is dead only if NEITHER the SDK NOR the template entrypoint reads it. Common dead suspects in older templates: `supervisor.strategy`, `supervisor.mode`.
 - **YAML ↔ entrypoint consistency:** for every key the SDK consumes, also verify the template's own `supervisor_entrypoint.py` either reads it directly or hands the parsed config to a code path that does. A key the SDK *would* consume via `from_yaml` but the template's manual loader silently drops is a SILENT DRIFT bug — flag and fix.
 - Are all constraint comments accurate? (e.g. if `special_instructions` IS consumed from YAML, the comment must say so — not "DO NOT add".)
+- **Check the top-of-file "ARCHITECTURE CONSTRAINTS" comment's tools/policies/skills claims against the capability matrix above, cell by cell** — grade each claim per the matching/drift rules there, even if the comment currently looks fixed.
 - Does the `agents:` example block show the correct fields (`name`, `type`, `description`, `special_instructions`, `mcp_servers`, `enable_knowledge`)? Remove any fields the SDK does not read.
 
 ### `cuga-templates/supervisor/supervisor_entrypoint.py`
@@ -121,7 +167,7 @@ cuga-templates/
 - **Apply the same per-key enumeration as `cuga-templates/supervisor/supervisor_config.yaml` above** (cite SDK or entrypoint line for every key, mark dead keys for removal). Pay particular attention to `supervisor.strategy`, `supervisor.mode`, and `supervisor.model.*` — historically these have been DEAD in this template (SDK reads only `agents` + `special_instructions`, and the template's own entrypoint forwards only those two).
 - Are all agents declared as `type: external` with `a2a_protocol` (endpoint, transport, timeout)?
 - Is `mcp_servers: []` (no MCP servers — all agents are external)?
-- Is the constraint comment accurate: supervisor has no tools, all execution is in external agents?
+- Grade the constraint comment's tools/policies/skills claims against the capability matrix above, cell by cell. In particular: is "supervisor has no tools" labeled as *this template's design choice* rather than an SDK limit (per the matrix's tools row)? Since this template has no internal sub-agents, does the comment correctly note that `.cuga/` policies load directly onto the supervisor itself (via `cuga_folder=` in `supervisor_entrypoint.py`), per the matrix's policies row, rather than implying the supervisor has no policy management at all?
 
 ### `cuga-templates/a2a_supervisor_external/supervisor_entrypoint.py`
 - Does the entrypoint loop correctly detect `a2a_protocol.enabled` and register agents as `{"type": "external", "config": agent_cfg}`?
@@ -148,6 +194,10 @@ cuga-templates/
 ### `cuga-templates/one_agent/agent_entrypoint.py`
 - Same API-accuracy check as supervisor entrypoint.
 - Does `CugaAgent(...)` use `enable_knowledge=True` and `cuga_folder` correctly per the SDK?
+- Cross-check this file's actual `CugaAgent(...)` kwargs against the capability matrix's CugaAgent
+  column for all three axes (tools, policies, skills) — e.g. if the matrix says `CugaAgent` accepts
+  `enable_skills`/`skills_folder`, confirm they're passed (and any needed env var is set before the
+  first `cuga` import, not after); don't only check the axis a previous sync happened to fix.
 - **YAML ↔ entrypoint consistency:** verify every key documented in `agent_config.yaml` is read by this entrypoint (or by an SDK call it delegates to). Flag and fix any silent omissions.
 
 ### `cuga-templates/one_agent/mcp_servers/mcp_server_template.py`
@@ -227,6 +277,17 @@ For each case where a YAML key the SDK *could* consume was being silently
 dropped by the template's manual loader:
 - `<template>/<entrypoint>.py`: now reads `<key>` from YAML and forwards it
   to `<SDK call>` (was silently ignored before)
+
+## Capability matrix (tools / policies / skills — CugaAgent vs CugaSupervisor)
+| Capability | CugaAgent | CugaSupervisor |
+|---|---|---|
+| Direct tools | <supports? which params, sdk.py:line> | <supports? which params, sdk.py:line> |
+| Policies (`.cuga/`) | <supports? which params, sdk.py:line> | <supports? which params, sdk.py:line> |
+| Skills (`SKILL.md`) | <supports? which params, sdk.py:line> | <supports? which params, sdk.py:line> |
+
+For any cell where a template's constraint comments claim something different from this row,
+list the file and what was fixed under "Changes made" above — this table is what future syncs
+diff against, so fill in real values, not placeholders.
 
 ## Key SDK facts (for analyst/implementer awareness)
 - CugaSupervisor: accepts <list parameters>; does NOT support <list what it lacks>

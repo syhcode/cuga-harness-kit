@@ -4,8 +4,16 @@
 #
 # Goal: CugaSupervisor acts as the orchestration layer. All computation is
 # delegated to external agents that run as independent services and are
-# exposed via the A2A protocol. The supervisor itself has NO tools and NO
-# mcp_servers — it only routes requests and synthesizes results.
+# exposed via the A2A protocol. The supervisor has no tools/mcp_servers of
+# its own — it only routes requests and synthesizes results. To give the
+# supervisor its own directly-callable tools, `CugaSupervisor.__init__`
+# accepts a `tool_provider=` kwarg (`sdk.py:2971-3048`); pass it in
+# supervisor_entrypoint.py if a spec ever needs that.
+# POLICIES are wired onto this supervisor: since there are no internal
+# CugaAgent sub-agents to hold them, the `cuga_folder=` passed to
+# `CugaSupervisor(...)` in supervisor_entrypoint.py loads `.cuga/` policies
+# (intent guards, playbooks, etc.) directly onto the supervisor itself — see
+# that file for the wiring.
 #
 # Each external agent:
 #   - Runs as a standalone HTTP service (any framework: LangGraph, custom, etc.)

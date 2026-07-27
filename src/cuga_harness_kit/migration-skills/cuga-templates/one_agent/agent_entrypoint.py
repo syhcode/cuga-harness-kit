@@ -22,6 +22,13 @@ from typing import Any, Dict, List, Optional
 import yaml
 from loguru import logger
 
+# Use the `.agents/skills/` universal layout (matches where skill_template/SKILL.md
+# is placed below) instead of CUGA's native default (`.cuga/skills/`). This MUST be
+# set before the first `cuga` import: dynaconf resolves DYNACONF_* env vars when the
+# Settings object is constructed (on import of cuga.config), not on each access —
+# setting it later (e.g. inside create()) is silently ignored.
+os.environ.setdefault("DYNACONF_SKILLS__ROOT", "agents")
+
 from cuga import CugaAgent
 from cuga.config import settings
 
@@ -103,12 +110,16 @@ class MyAgent:  # {{PLACEHOLDER: rename to match the spec's entrypoint_module}}
 
         # enable_knowledge=True: activates CUGA's native knowledge engine.
         # Any source knowledge base / RAG functionality is covered here — no custom MCP server needed.
+        # enable_skills=True: activates skills discovery (load_skill tool + prompt block).
+        # Skills are OFF by default (settings.skills.enabled=false in settings.toml) — this
+        # constructor override is required or .agents/skills/*/SKILL.md is silently ignored.
         agent = CugaAgent(
             tools=all_tools,
             tool_provider=None,
             cuga_folder=_CUGA_FOLDER,
             callbacks=callbacks,
             enable_knowledge=True,
+            enable_skills=True,
             reset_policy_storage=True,
             auto_load_policies=False,
             filesystem_sync=False,

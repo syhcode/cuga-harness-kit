@@ -68,7 +68,15 @@ wait_for_port 8114 "my_data_server"   # {{PLACEHOLDER: match each server and por
 # wait_for_port 8115 "my_other_server"
 
 # ── Start CUGA backend ────────────────────────────────────────────────────────
+# DYNACONF_SUPERVISOR__ENABLED / DYNACONF_SUPERVISOR__CONFIG_PATH are what tell
+# cuga.backend.server.main:app to load THIS supervisor_config.yaml instead of
+# running in single-agent mode (settings.supervisor.enabled defaults to false).
+# This mirrors the exact env vars `cuga start travel_agent` sets before booting
+# its own uvicorn process (cuga/cli/main.py, "elif service == 'travel_agent':").
+# CONFIG_PATH must be absolute — the backend resolves it relative to os.getcwd().
 echo "[start] Starting CUGA backend server on port 7860..."
+export DYNACONF_SUPERVISOR__ENABLED=true
+export DYNACONF_SUPERVISOR__CONFIG_PATH="$ROOT_DIR/supervisor_config.yaml"
 uv run uvicorn cuga.backend.server.main:app --host 0.0.0.0 --port 7860 &
 PID_BACKEND=$!
 wait_for_port 7860 "CUGA backend"

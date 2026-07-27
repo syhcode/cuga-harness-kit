@@ -23,6 +23,7 @@ No git clone, no marketplace install:
 
 ```bash
 uv tool install cuga-harness-kit
+(if update: uv pip install -e . --reinstall-package cuga-harness-kit)
 cuga-harness-kit init
 ```
 
