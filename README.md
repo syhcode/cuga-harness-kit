@@ -50,7 +50,7 @@ Run `init` from an empty new project you're starting from scratch, or from insid
 | `knowledge-rag` | Document ingestion/search. |
 | `debug-trajectory` | `cuga viz`, `cuga doctor`, common failure patterns. |
 
-Each is authored once as a `SKILL.md` under `src/cuga_harness_kit/plain-skills/`, then rendered into the Cursor/Codex shapes (or used verbatim for Claude/Bob) at `init` time.
+Each is authored once as a `SKILL.md` under `src/cuga_harness_kit/builder-skills/`, then rendered into the Cursor/Codex shapes (or used verbatim for Claude/Bob) at `init` time.
 
 ## CLI
 

@@ -9,7 +9,7 @@ from pathlib import Path
 from cuga_harness_kit import dispatch, migration
 from cuga_harness_kit.render import render_agents_section, render_mdc
 
-SKILLS_DIR = Path(__file__).parent / "plain-skills"
+SKILLS_DIR = Path(__file__).parent / "builder-skills"
 DOCS_DIR = Path(__file__).parent / "docs"
 ALL_TARGETS = ("claude", "cursor", "codex", "bob")
 AGENTS_START = "<!-- cuga-harness-kit:start -->"
@@ -165,7 +165,7 @@ def _add_targets_arg(subparser: argparse.ArgumentParser) -> None:
         action="store_true",
         help=(
             "scaffold the cuga-migrator pipeline (skills, subagents, launch scripts) for "
-            f"{migration.MIGRATION_TARGETS} instead of the plain guidance skills"
+            f"{migration.MIGRATION_TARGETS} instead of the builder guidance skills"
         ),
     )
     subparser.add_argument(
